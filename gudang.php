@@ -215,9 +215,7 @@ $result = displayDataBarang();
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kembali</button>
-            <!-- Fixing the delete button -->
             <button type="submit" class="btn btn-danger" name="prosesDelete">Hapus</button>
-            <!-- Updated the value attribute to match the name used in the PHP script -->
             <input type="hidden" name="kodeBarang" id="prosesDelete">
           </div>
         </form>
