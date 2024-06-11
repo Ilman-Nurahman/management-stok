@@ -18,7 +18,7 @@
             <img src="./assets/Logo-Bengkel.png" width="200" alt="logo-bengkel" />
         </div>
         <ul>
-            <li><a href="dashboard.php">Halaman Utama</a></li>
+            <li><a href="dashboard.php">Dashboard</a></li>
             <li><a href="gudang.php">Stok Gudang</a></li>
             <li><a href="master.php">Data Master</a></li>
             <li><a href="transaksi.php">Transaksi</a></li>

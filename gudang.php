@@ -31,7 +31,6 @@ if (isset($_POST["prosesEdit"])) {
 // Proses delete
 if (isset($_POST["prosesDelete"])) {
   try {
-    var_dump($_POST); // Debugging output
     deleteDataBarang($_POST["kodeBarang"]);
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
@@ -62,7 +61,7 @@ $result = displayDataBarang();
       <img src="./assets/Logo-Bengkel.png" width="200" alt="logo-bengkel" />
     </div>
     <ul>
-      <li><a href="dashboard.php">Halaman Utama</a></li>
+      <li><a href="dashboard.php">Dashboard</a></li>
       <li><a href="gudang.php">Stok Gudang</a></li>
       <li><a href="master.php">Data Master</a></li>
       <li><a href="transaksi.php">Transaksi</a></li>
@@ -143,7 +142,7 @@ $result = displayDataBarang();
           <div class="modal-body">
             <div class="mb-3">
               <label for="kodeBarang" class="form-label">Kode Barang</label>
-              <input type="text" class="form-control" name="kodeBarang" id="kodeBarang" placeholder="Masukkan kode barang">
+              <input type="text" class="form-control" name="kodeBarang" id="kodeBarang" placeholder="Masukan kode barang (contoh: B01XXX)">
             </div>
             <div class="mb-3">
               <label for="namaBarang" class="form-label">Nama Barang</label>
@@ -200,7 +199,6 @@ $result = displayDataBarang();
     </div>
   </div>
 
-  <!-- Modal delete-->
   <!-- Modal delete-->
   <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
