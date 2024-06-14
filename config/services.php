@@ -7,7 +7,7 @@ function displayDataBarang()
 {
     global $conn;
     try {
-        $queryGet = 'SELECT * FROM barang';
+        $queryGet = 'SELECT * FROM stok_gudang';
         $stmt = mysqli_prepare($conn, $queryGet);
         if ($stmt === false) {
             throw new Error('Statement preparation failed: ' . mysqli_error($conn));
@@ -34,7 +34,7 @@ function tambahDataBarang($kodeBarang, $namaBarang, $totalKuantitas, $hargaBaran
 {
     global $conn;
     try {
-        $queryInsert = "INSERT INTO barang (kode_barang, nama_barang, total_kuantitas, harga_barang) VALUES (?, ?, ?, ?)";
+        $queryInsert = "INSERT INTO stok_gudang (kode_barang, nama_barang, total_kuantitas, harga_barang) VALUES (?, ?, ?, ?)";
         $stmt = mysqli_prepare($conn, $queryInsert);
         if ($stmt === false) {
             throw new Error('Statement preparation failed: ' . mysqli_error($conn));
@@ -57,7 +57,7 @@ function updateDataBarang($kodeBarang, $namaBarang, $totalKuantitas, $hargaBaran
 {
     global $conn;
     try {
-        $queryUpdate = "UPDATE barang SET nama_barang = ?, total_kuantitas = ?, harga_barang = ? WHERE kode_barang = ?";
+        $queryUpdate = "UPDATE stok_gudang SET nama_barang = ?, total_kuantitas = ?, harga_barang = ? WHERE kode_barang = ?";
         $stmt = mysqli_prepare($conn, $queryUpdate);
         mysqli_stmt_bind_param($stmt, 'sids', $namaBarang, $totalKuantitas, $hargaBarang, $kodeBarang);
         $resultUpdate = mysqli_stmt_execute($stmt);
@@ -72,7 +72,7 @@ function deleteDataBarang($kodeBarang)
 {
     global $conn;
     try {
-        $queryDelete = "DELETE FROM barang WHERE kode_barang = ?";
+        $queryDelete = "DELETE FROM stok_gudang WHERE kode_barang = ?";
         $stmt = mysqli_prepare($conn, $queryDelete);
         mysqli_stmt_bind_param($stmt, 's', $kodeBarang);
         $resultDelete = mysqli_stmt_execute($stmt);
