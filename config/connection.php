@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "management_stok";
+$dbname = "stokbarang";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
