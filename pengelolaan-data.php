@@ -9,7 +9,7 @@ if (isset($_POST["prosesTambah"])) {
     // Call the function to add data
     tambahDataSatuan($_POST["idSatuan"], $_POST["namaSatuan"], $_POST["inisialSatuan"]);
     tambahDataTipeBarang($_POST["kodeTipe"], $_POST["namaTipe"]);
-    // Redirect to master.php if successful
+    // Redirect to pengelolaan-data.php if successful
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
   } catch (Exception $e) {
@@ -75,7 +75,7 @@ foreach ($resultTipeBarang as $type) {
     <ul>
       <li><a href="dashboard.php">Dashboard</a></li>
       <li><a href="gudang.php">Stok Gudang</a></li>
-      <li><a href="master.php">Data Master</a></li>
+      <li><a href="pengelolaan-data.php">Pengelolaan Data</a></li>
       <li><a href="transaksi.php">Transaksi</a></li>
       <li><a href="user.php">User Manajemen</a></li>
       <li><a href="notification.php">Notifikasi</a></li>
