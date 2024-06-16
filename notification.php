@@ -1,3 +1,10 @@
+<?php
+require_once('config/connection.php');
+require_once('config/helper.php');
+require_once('config/services.php');
+
+$result = displayDataAktivitasPengguna();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,15 +29,15 @@
       <li><a href="gudang.php">Stok Gudang</a></li>
       <li><a href="pengelolaan-data.php">Pengelolaan Data</a></li>
       <li><a href="transaksi.php">Transaksi</a></li>
-      <li><a href="user.php">User Manajemen</a></li>
-      <li><a href="notification.php">Notifikasi</a></li>
+      <li><a href="user.php">Manajemen Pengguna</a></li>
+      <li><a href="notification.php">Aktivitas Pengguna</a></li>
     </ul>
   </div>
 
   <div class="content">
     <nav class="navbar navbar-light bg-light">
       <div class="container-fluid">
-        <a class="navbar-brand"><i class="bi bi-arrow-bar-left me-2"></i>Notifikasi</a>
+        <a class="navbar-brand"><i class="bi bi-arrow-bar-left me-2"></i>Aktivitas Pengguna</a>
         <form class="d-flex">
           <a href="login.php"><button class="btn btn-outline-primary" type="button">
               <i class="bi bi-box-arrow-left me-2"></i>
@@ -48,33 +55,34 @@
     <table class="table table-striped table-hover mt-4">
       <thead>
         <tr>
-          <th>No</th>
-          <th>Nama User</th>
-          <th>Update</th>
-          <th>Description</th>
+          <?php
+          $headerAktivitas = ["No", "Nama Pengguna", "Tanggal", "Deskripsi"];
+          for ($i = 0; $i < count($headerAktivitas); $i++) {
+            echo "<th scope='col'>";
+            echo $headerAktivitas[$i];
+            echo "</th>";
+          }
+          ?>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>1</td>
-          <td>Ilman Nurahman</td>
-          <td>24/04/2024</td>
-          <td>Menghapus data barang masuk dengan kode 01OLI</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Syarif Hidayat</td>
-          <td>24/04/2024</td>
-          <td>Menghapus data barang keluar dengan kode 02OLI</td>
-        </tr>
-
-        <tr>
-          <td>3</td>
-          <td>Ikhsan Rifaldi</td>
-          <td>24/04/2024</td>
-          <td>Menghapus data barang masuk dengan kode 03OLI</td>
-        </tr>
-        <!-- Add more rows as needed -->
+        <?php
+        $no = 0;
+        if ($result && $result->num_rows > 0) {
+          while ($row = mysqli_fetch_array($result)) {
+            $no++;
+            echo "<tr>";
+            echo "<td>" . $no . "</td>";
+            echo "<td>" . $row["fullname"] . "</td>";
+            echo "<td>" . $row["created_at"] . "</td>";
+            echo "<td>" . $row["description"] . "</td>";
+            echo "</td>";
+            echo "</tr>";
+          }
+        } else {
+          echo "<tr class='text-center'><td colspan='6'>No data found</td></tr>";
+        }
+        ?>
       </tbody>
     </table>
 

@@ -83,7 +83,7 @@ function deleteDataBarang($kodeBarang)
     }
 }
 
-// ================ MENU MASTER ================ \\
+// ================ MENU PENGELOLAAN DATA ================ \\
 
 function displayDataSatuan()
 {
@@ -240,6 +240,144 @@ function deleteDataTipeBarang($kodeTipe)
         $resultDelete = mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
         return $resultDelete;
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
+// ================ MENU MANAGEMEN PENGGUNA ================ \\
+
+function displayDataManajemenPengguna()
+{
+    global $conn;
+    try {
+        $queryGet = 'SELECT * FROM user';
+        $stmt = mysqli_prepare($conn, $queryGet);
+        if ($stmt === false) {
+            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        $result = mysqli_stmt_execute($stmt);
+        if ($result === false) {
+            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+        if ($result === false) {
+            throw new Error('Getting result set failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        mysqli_stmt_close($stmt);
+        return $result;
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
+function displayDataRole()
+{
+    global $conn;
+    try {
+        $queryGet = 'SELECT * FROM role';
+        $stmt = mysqli_prepare($conn, $queryGet);
+        if ($stmt === false) {
+            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        $result = mysqli_stmt_execute($stmt);
+        if ($result === false) {
+            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+        if ($result === false) {
+            throw new Error('Getting result set failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        mysqli_stmt_close($stmt);
+        return $result;
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
+function tambahDataPengguna($idUser, $avatar, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $kataSandi, $idRole, $roleName)
+{
+    global $conn;
+    try {
+        $queryInsert = "INSERT INTO user (id_user, avatar, username, fullname, no_telp, address_user, email, password_user, id_role, role_name) VALUES (?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conn, $queryInsert);
+        if ($stmt === false) {
+            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        mysqli_stmt_bind_param($stmt, 'ssii', $idUser, $avatar, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $kataSandi, $idRole, $roleName);
+        $resultInsert = mysqli_stmt_execute($stmt);
+        if ($resultInsert === false) {
+            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        mysqli_stmt_close($stmt);
+        return $resultInsert;
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
+function updateDataPengguna($idUser, $avatar, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $kataSandi, $idRole, $roleName)
+{
+    global $conn;
+    try {
+        $queryUpdate = "UPDATE user SET avatar = ?, username = ?, fullname = ?, no_telp = ?, address_user = ?, email = ?, password_user = ?, id_role = ?, role_name = ? WHERE id_user = ?";
+        $stmt = mysqli_prepare($conn, $queryUpdate);
+        mysqli_stmt_bind_param($stmt, 'sids', $avatar, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $kataSandi, $idRole, $roleName, $idUser);
+        $resultUpdate = mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+        return $resultUpdate;
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
+function deleteDataPengguna($idUser)
+{
+    global $conn;
+    try {
+        $queryDelete = "DELETE FROM user WHERE id_user = ?";
+        $stmt = mysqli_prepare($conn, $queryDelete);
+        mysqli_stmt_bind_param($stmt, 's', $idUser);
+        $resultDelete = mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+        return $resultDelete;
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
+// ================ MENU AKTIVITAS PENGGUNA ================ \\
+
+function displayDataAktivitasPengguna()
+{
+    global $conn;
+    try {
+        $queryGet = 'SELECT * FROM notifications';
+        $stmt = mysqli_prepare($conn, $queryGet);
+        if ($stmt === false) {
+            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        $result = mysqli_stmt_execute($stmt);
+        if ($result === false) {
+            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+        if ($result === false) {
+            throw new Error('Getting result set failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        mysqli_stmt_close($stmt);
+        return $result;
     } catch (Error $e) {
         echo "Caught error: " . $e->getMessage();
     }

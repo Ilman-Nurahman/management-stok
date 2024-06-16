@@ -77,8 +77,8 @@ foreach ($resultTipeBarang as $type) {
       <li><a href="gudang.php">Stok Gudang</a></li>
       <li><a href="pengelolaan-data.php">Pengelolaan Data</a></li>
       <li><a href="transaksi.php">Transaksi</a></li>
-      <li><a href="user.php">User Manajemen</a></li>
-      <li><a href="notification.php">Notifikasi</a></li>
+      <li><a href="user.php">Manajemen Pengguna</a></li>
+      <li><a href="notification.php">Aktivitas Pengguna</a></li>
     </ul>
   </div>
 
