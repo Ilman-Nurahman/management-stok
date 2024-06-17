@@ -7,15 +7,112 @@
     <title>Manajemen Pengguna - Management Stok</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-    <!-- Custom CSS -->
-    <link href="./css/stok.css" rel="stylesheet" />
 </head>
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .animated-card {
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    .card-img-top {
+        aspect-ratio: 16/9;
+        object-fit: cover;
+        width: 100%;
+        height: auto;
+    }
+
+    .alert-info {
+        background-color: #e9f7fe;
+        border-color: #b8e1f5;
+        color: #31708f;
+    }
+
+    /* Global styles */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+        height: 100%;
+        width: 250px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: rgb(0, 162, 255);
+        padding-top: 20px;
+        transition: width 0.3s ease;
+        /* Smooth transition for sidebar width */
+    }
+
+    .sidebar h2 {
+        color: #fff;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .sidebar ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar li {
+        padding: 10px;
+        transition: background-color 0.3s ease;
+        /* Smooth transition for background color change */
+    }
+
+    .sidebar a {
+        color: #fff;
+        text-decoration: none;
+        display: block;
+        /* Ensures the entire li area is clickable */
+        padding: 10px;
+    }
+
+    .sidebar li.active {
+        background-color: #555;
+        /* Active background color */
+    }
+
+    .sidebar li.active a {
+        font-weight: bold;
+        /* Example: Highlight active link with bold text */
+    }
+
+    .sidebar a:hover {
+        background-color: #555;
+        border-radius: 10px;
+        /* Hover background color */
+    }
+
+    /* Content styles */
+    .content {
+        margin-left: 250px;
+        padding: 20px;
+        transition: margin-left 0.3s ease;
+        /* Smooth transition for content margin adjustment */
+    }
+</style>
 
 <body>
     <?php
     require_once('config/connection.php');
     require_once('config/helper.php');
     require_once('config/services.php');
+
+    $current_page = basename($_SERVER['REQUEST_URI']);
 
     // Get new ID for user
     $newId = getNewId($conn, 'user');
@@ -118,12 +215,12 @@
             <img src="./assets/Logo-Bengkel.png" width="200" alt="logo-bengkel" />
         </div>
         <ul>
-            <li><a href="dashboard.php">Dashboard</a></li>
-            <li><a href="stok-gudang.php">Stok Gudang</a></li>
-            <li><a href="pengelolaan-data.php">Pengelolaan Data</a></li>
-            <li><a href="transaksi.php">Transaksi</a></li>
-            <li><a href="user.php">Manajemen Pengguna</a></li>
-            <li><a href="notification.php">Aktivitas Pengguna</a></li>
+            <li class="<?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>"><a href="dashboard.php">Dashboard</a></li>
+            <li class="<?php echo $current_page == 'stok-gudang.php' ? 'active' : ''; ?>"><a href="stok-gudang.php">Stok Gudang</a></li>
+            <li class="<?php echo $current_page == 'pengelolaan-data.php' ? 'active' : ''; ?>"><a href="pengelolaan-data.php">Pengelolaan Data</a></li>
+            <li class="<?php echo $current_page == 'transaksi.php' ? 'active' : ''; ?>"><a href="transaksi.php">Transaksi</a></li>
+            <li class="<?php echo $current_page == 'user.php' ? 'active' : ''; ?>"><a href="user.php">Manajemen Pengguna</a></li>
+            <li class="<?php echo $current_page == 'notification.php' ? 'active' : ''; ?>"><a href="notification.php">Aktivitas Pengguna</a></li>
         </ul>
     </div>
 
@@ -150,7 +247,7 @@
             if ($result && $result->num_rows > 0) {
                 while ($row = mysqli_fetch_array($result)) {
                     echo '<div class="col-12 col-md-6 col-lg-4 mb-4">';
-                    echo '<div class="card" style="width: 100%;">';
+                    echo '<div class="card animated-card" style="width: 100%;">';
                     echo '<img src="' . htmlspecialchars($row["avatar"]) . '" class="card-img-top" alt="img-avatar">';
                     echo '<div class="card-body">';
                     echo '<table class="table table-bordered">';
@@ -417,19 +514,5 @@
         }
     </script>
 </body>
-<style>
-    .card-img-top {
-        aspect-ratio: 16/9;
-        object-fit: cover;
-        width: 100%;
-        height: auto;
-    }
-
-    .alert-info {
-        background-color: #e9f7fe;
-        border-color: #b8e1f5;
-        color: #31708f;
-    }
-</style>
 
 </html>
