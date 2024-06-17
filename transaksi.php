@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Transaction - Management Stok</title>
+  <title>Transaksi - Management Stok</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
   <!-- Custom CSS -->
@@ -42,72 +42,6 @@
     <!-- content -->
     <div class="card pt-2 px-3 bg-primary" style="margin-top: 3%">
       <div class="d-flex justify-content-between align-items-center">
-        <h4 class="text-white">Data Transaksi</h4>
-        <button type="button" class="btn btn-outline-light mb-2" data-bs-toggle="modal" data-bs-target="#exampleModalCreate">
-          Tambah
-        </button>
-      </div>
-    </div>
-    <table class="table table-striped table-hover mt-4">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Kode Barang</th>
-          <th>Nama Barang</th>
-          <th>Tipe Barang</th>
-          <th>Jumlah Barang</th>
-          <th>Harga Barang (pcs)</th>
-          <th>Laporan di update</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>01OLI</td>
-          <td>Oli Castrol 30ml</td>
-          <td>Oli</td>
-          <td>200</td>
-          <td>50.000</td>
-          <td>24/04/2024</td>
-          <td>
-            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModalEdit"">Edit</button>
-                <button type=" button" class="btn btn-danger btn-sm">Delete</button>
-          </td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>02OLI</td>
-          <td>Oli Castrol 450ml</td>
-          <td>Oli</td>
-          <td>200</td>
-          <td>50.000</td>
-          <td>24/04/2024</td>
-          <td>
-            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModalEdit">Edit</button>
-            <button type="button" class="btn btn-danger btn-sm">Delete</button>
-          </td>
-        </tr>
-
-        <tr>
-          <td>3</td>
-          <td>03OLI</td>
-          <td>Oli Yamalube 450ml</td>
-          <td>Oli</td>
-          <td>300</td>
-          <td>50.000</td>
-          <td>24/04/2024</td>
-          <td>
-            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModalEdit">Edit</button>
-            <button type="button" class="btn btn-danger btn-sm">Delete</button>
-          </td>
-        </tr>
-        <!-- Add more rows as needed -->
-      </tbody>
-    </table>
-    <!-- barang keluar -->
-    <div class="card pt-2 px-3 mt-5 bg-primary">
-      <div class="d-flex justify-content-between align-items-center">
         <h4 class="text-white">Barang Keluar</h4>
         <button type="button" class="btn btn-outline-light mb-2" data-bs-toggle="modal" data-bs-target="#exampleModalCreate">
           Tambah
@@ -128,47 +62,31 @@
         </tr>
       </thead>
       <tbody>
+      </tbody>
+    </table>
+    <!-- barang keluar -->
+    <div class="card pt-2 px-3 mt-5 bg-primary">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="text-white">Barang Masuk</h4>
+        <button type="button" class="btn btn-outline-light mb-2" data-bs-toggle="modal" data-bs-target="#exampleModalCreate">
+          Tambah
+        </button>
+      </div>
+    </div>
+    <table class="table table-striped table-hover mt-4">
+      <thead>
         <tr>
-          <td>1</td>
-          <td>01OLI</td>
-          <td>Oli Castrol 30ml</td>
-          <td>Oli</td>
-          <td>200</td>
-          <td>50.000</td>
-          <td>24/04/2024</td>
-          <td>
-            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModalEdit">Edit</button>
-            <button type="button" class="btn btn-danger btn-sm">Delete</button>
-          </td>
+          <th>No</th>
+          <th>Kode Barang</th>
+          <th>Nama Barang</th>
+          <th>Tipe Barang</th>
+          <th>Jumlah Barang</th>
+          <th>Harga Barang (pcs)</th>
+          <th>Laporan di update</th>
+          <th>Aksi</th>
         </tr>
-        <tr>
-          <td>2</td>
-          <td>02OLI</td>
-          <td>Oli Castrol 450ml</td>
-          <td>Oli</td>
-          <td>200</td>
-          <td>50.000</td>
-          <td>24/04/2024</td>
-          <td>
-            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModalEdit">Edit</button>
-            <button type="button" class="btn btn-danger btn-sm">Delete</button>
-          </td>
-        </tr>
-
-        <tr>
-          <td>3</td>
-          <td>03OLI</td>
-          <td>Oli Yamalube 450ml</td>
-          <td>Oli</td>
-          <td>300</td>
-          <td>50.000</td>
-          <td>24/04/2024</td>
-          <td>
-            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModalEdit">Edit</button>
-            <button type="button" class="btn btn-danger btn-sm">Delete</button>
-          </td>
-        </tr>
-        <!-- Add more rows as needed -->
+      </thead>
+      <tbody>
       </tbody>
     </table>
   </div>

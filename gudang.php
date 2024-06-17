@@ -39,7 +39,7 @@ if (isset($_POST["prosesDelete"])) {
   }
 }
 
-$result = displayDataBarang();
+$result = displayDataStokGudang();
 ?>
 <!DOCTYPE html>
 <html lang="en">

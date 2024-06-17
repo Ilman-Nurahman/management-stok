@@ -3,7 +3,7 @@ require_once('config/connection.php');
 
 // ================ MENU GUDANG ================ \\
 
-function displayDataBarang()
+function displayDataStokGudang()
 {
     global $conn;
     try {
@@ -85,6 +85,33 @@ function deleteDataBarang($kodeBarang)
 
 // ================ MENU PENGELOLAAN DATA ================ \\
 
+function displayDataBarang()
+{
+    global $conn;
+    try {
+        $queryGet = 'SELECT * FROM barang';
+        $stmt = mysqli_prepare($conn, $queryGet);
+        if ($stmt === false) {
+            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        $result = mysqli_stmt_execute($stmt);
+        if ($result === false) {
+            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+        if ($result === false) {
+            throw new Error('Getting result set failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        mysqli_stmt_close($stmt);
+        return $result;
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
 function displayDataSatuan()
 {
     global $conn;
@@ -146,19 +173,19 @@ function tambahDataSatuan($idSatuan, $namaSatuan, $inisialSatuan)
         $queryInsert = "INSERT INTO satuan (id_satuan, nama_satuan, inisial_satuan) VALUES (?, ?, ?)";
         $stmt = mysqli_prepare($conn, $queryInsert);
         if ($stmt === false) {
-            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+            throw new Exception('Statement preparation failed: ' . mysqli_error($conn));
         }
 
-        mysqli_stmt_bind_param($stmt, 'ssii', $idSatuan, $namaSatuan, $inisialSatuan);
+        mysqli_stmt_bind_param($stmt, 'sss', $idSatuan, $namaSatuan, $inisialSatuan);
         $resultInsert = mysqli_stmt_execute($stmt);
         if ($resultInsert === false) {
-            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+            throw new Exception('Statement execution failed: ' . mysqli_stmt_error($stmt));
         }
 
         mysqli_stmt_close($stmt);
         return $resultInsert;
-    } catch (Error $e) {
-        echo "Caught error: " . $e->getMessage();
+    } catch (Exception $e) {
+        echo "Caught exception: " . $e->getMessage();
     }
 }
 
@@ -172,7 +199,7 @@ function tambahDataTipeBarang($kodeTipe, $namaTipe)
             throw new Error('Statement preparation failed: ' . mysqli_error($conn));
         }
 
-        mysqli_stmt_bind_param($stmt, 'ssii', $kodeTipe, $namaTipe);
+        mysqli_stmt_bind_param($stmt, 'ss', $kodeTipe, $namaTipe);
         $resultInsert = mysqli_stmt_execute($stmt);
         if ($resultInsert === false) {
             throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
@@ -191,27 +218,43 @@ function updateDataSatuan($idSatuan, $namaSatuan, $inisialSatuan)
     try {
         $queryUpdate = "UPDATE satuan SET nama_satuan = ?, inisial_satuan = ? WHERE id_satuan = ?";
         $stmt = mysqli_prepare($conn, $queryUpdate);
-        mysqli_stmt_bind_param($stmt, 'sids', $namaSatuan, $inisialSatuan, $idSatuan);
+        if ($stmt === false) {
+            throw new Exception('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        mysqli_stmt_bind_param($stmt, 'sss', $namaSatuan, $inisialSatuan, $idSatuan);
         $resultUpdate = mysqli_stmt_execute($stmt);
+        if ($resultUpdate === false) {
+            throw new Exception('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
         mysqli_stmt_close($stmt);
         return $resultUpdate;
-    } catch (Error $e) {
-        echo "Caught error: " . $e->getMessage();
+    } catch (Exception $e) {
+        echo "Caught exception: " . $e->getMessage();
     }
 }
 
-function updateDataTipeBarang($kodeTipe, $namaTipe)
+function updateDataTipeBarang($originalKodeTipe, $newKodeTipe, $namaTipe)
 {
     global $conn;
     try {
-        $queryUpdate = "UPDATE tipe_barang SET nama_tipe = ? WHERE kode_Tipe = ?";
+        $queryUpdate = "UPDATE tipe_barang SET kode_tipe = ?, nama_tipe = ? WHERE kode_tipe = ?";
         $stmt = mysqli_prepare($conn, $queryUpdate);
-        mysqli_stmt_bind_param($stmt, 'sids', $namaTipe, $kodeTipe);
+        if ($stmt === false) {
+            throw new Exception('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        mysqli_stmt_bind_param($stmt, 'sss', $newKodeTipe, $namaTipe, $originalKodeTipe);
         $resultUpdate = mysqli_stmt_execute($stmt);
+        if ($resultUpdate === false) {
+            throw new Exception('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
         mysqli_stmt_close($stmt);
         return $resultUpdate;
-    } catch (Error $e) {
-        echo "Caught error: " . $e->getMessage();
+    } catch (Exception $e) {
+        echo "Caught exception: " . $e->getMessage();
     }
 }
 
@@ -301,17 +344,20 @@ function displayDataRole()
     }
 }
 
-function tambahDataPengguna($idUser, $avatar, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $kataSandi, $idRole, $roleName)
+function tambahDataPengguna($idUser, $avatarPath, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $kataSandi, $idRole, $roleName, $createdAt)
 {
     global $conn;
     try {
-        $queryInsert = "INSERT INTO user (id_user, avatar, username, fullname, no_telp, address_user, email, password_user, id_role, role_name) VALUES (?, ?, ?, ?)";
+        $queryInsert = "INSERT INTO user (id_user, avatar, username, fullname, no_telp, address_user, email, password_user, id_role, role_name, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($conn, $queryInsert);
         if ($stmt === false) {
             throw new Error('Statement preparation failed: ' . mysqli_error($conn));
         }
 
-        mysqli_stmt_bind_param($stmt, 'ssii', $idUser, $avatar, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $kataSandi, $idRole, $roleName);
+        // Adjusting the data types for each parameter
+        // 's' for strings (all the fields are treated as strings here, including IDs)
+        mysqli_stmt_bind_param($stmt, 'ssssssssiss', $idUser, $avatarPath, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $kataSandi, $idRole, $roleName, $createdAt);
+
         $resultInsert = mysqli_stmt_execute($stmt);
         if ($resultInsert === false) {
             throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
@@ -324,14 +370,37 @@ function tambahDataPengguna($idUser, $avatar, $namaPengguna, $namaLengkap, $nomo
     }
 }
 
-function updateDataPengguna($idUser, $avatar, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $kataSandi, $idRole, $roleName)
+
+function updateDataPengguna($idUser, $avatarPath, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $idRole, $roleName, $createdAt, $hashedPassword)
 {
     global $conn;
     try {
-        $queryUpdate = "UPDATE user SET avatar = ?, username = ?, fullname = ?, no_telp = ?, address_user = ?, email = ?, password_user = ?, id_role = ?, role_name = ? WHERE id_user = ?";
+        $queryUpdate = "UPDATE user SET avatar = ?, username = ?, fullname = ?, no_telp = ?, address_user = ?, email = ?, id_role = ?, role_name = ?, created_at = ?";
+
+        // Check if the password is provided
+        if (!empty($hashedPassword)) {
+            $queryUpdate .= ", password_user = ?";
+        }
+
+        $queryUpdate .= " WHERE id_user = ?";
+
         $stmt = mysqli_prepare($conn, $queryUpdate);
-        mysqli_stmt_bind_param($stmt, 'sids', $avatar, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $kataSandi, $idRole, $roleName, $idUser);
+        if ($stmt === false) {
+            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+        }
+        echo var_dump($roleName);
+        // Bind parameters
+        if (!empty($hashedPassword)) {
+            mysqli_stmt_bind_param($stmt, 'sssisssissi', $avatarPath, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $idRole, $roleName, $createdAt, $hashedPassword, $idUser);
+        } else {
+            mysqli_stmt_bind_param($stmt, 'sssisssisi', $avatarPath, $namaPengguna, $namaLengkap, $nomorTelepon, $alamat, $email, $idRole, $roleName, $createdAt, $idUser);
+        }
+
         $resultUpdate = mysqli_stmt_execute($stmt);
+        if ($resultUpdate === false) {
+            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
         mysqli_stmt_close($stmt);
         return $resultUpdate;
     } catch (Error $e) {
@@ -343,14 +412,33 @@ function deleteDataPengguna($idUser)
 {
     global $conn;
     try {
+        // Ambil nama file avatar dari database berdasarkan id_user
+        $queryAvatar = "SELECT avatar FROM user WHERE id_user = ?";
+        $stmtAvatar = mysqli_prepare($conn, $queryAvatar);
+        mysqli_stmt_bind_param($stmtAvatar, 's', $idUser);
+        mysqli_stmt_execute($stmtAvatar);
+        mysqli_stmt_bind_result($stmtAvatar, $avatarPath);
+        mysqli_stmt_fetch($stmtAvatar);
+        mysqli_stmt_close($stmtAvatar);
+
+        // Hapus pengguna dari database
         $queryDelete = "DELETE FROM user WHERE id_user = ?";
         $stmt = mysqli_prepare($conn, $queryDelete);
         mysqli_stmt_bind_param($stmt, 's', $idUser);
         $resultDelete = mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
+
+        // Jika pengguna berhasil dihapus dari database, hapus file avatar jika ada
+        if ($resultDelete && !empty($avatarPath)) {
+            $fullAvatarPath = 'uploads/avatars/' . basename($avatarPath);
+            if (file_exists($fullAvatarPath)) {
+                unlink($fullAvatarPath); // Hapus file avatar
+            }
+        }
+
         return $resultDelete;
-    } catch (Error $e) {
-        echo "Caught error: " . $e->getMessage();
+    } catch (Exception $e) {
+        echo "Error: " . $e->getMessage();
     }
 }
 
