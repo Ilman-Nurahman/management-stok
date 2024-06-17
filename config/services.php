@@ -30,7 +30,7 @@ function displayDataStokGudang()
     }
 }
 
-function tambahDataBarang($kodeBarang, $namaBarang, $totalKuantitas, $hargaBarang)
+function tambahDataStokGudang($kodeBarang, $namaBarang, $totalKuantitas, $hargaBarang)
 {
     global $conn;
     try {
@@ -53,7 +53,7 @@ function tambahDataBarang($kodeBarang, $namaBarang, $totalKuantitas, $hargaBaran
     }
 }
 
-function updateDataBarang($kodeBarang, $namaBarang, $totalKuantitas, $hargaBarang)
+function updateDataStokGudang($kodeBarang, $namaBarang, $totalKuantitas, $hargaBarang)
 {
     global $conn;
     try {
@@ -68,7 +68,7 @@ function updateDataBarang($kodeBarang, $namaBarang, $totalKuantitas, $hargaBaran
     }
 }
 
-function deleteDataBarang($kodeBarang)
+function deleteDataStokGudang($kodeBarang)
 {
     global $conn;
     try {
@@ -166,6 +166,29 @@ function displayDataTipeBarang()
     }
 }
 
+function tambahDataBarang($kodeBarang, $namaBarang, $kodeTipe, $idSatuan, $hargaBarang)
+{
+    global $conn;
+    try {
+        $queryInsert = "INSERT INTO barang (kode_barang, nama_barang, kode_tipe, id_satuan, harga_barang) VALUES (?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conn, $queryInsert);
+        if ($stmt === false) {
+            throw new Exception('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        mysqli_stmt_bind_param($stmt, 'sssss', $kodeBarang, $namaBarang, $kodeTipe, $idSatuan, $hargaBarang);
+        $resultInsert = mysqli_stmt_execute($stmt);
+        if ($resultInsert === false) {
+            throw new Exception('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        mysqli_stmt_close($stmt);
+        return $resultInsert;
+    } catch (Exception $e) {
+        echo "Caught exception: " . $e->getMessage();
+    }
+}
+
 function tambahDataSatuan($idSatuan, $namaSatuan, $inisialSatuan)
 {
     global $conn;
@@ -212,6 +235,30 @@ function tambahDataTipeBarang($kodeTipe, $namaTipe)
     }
 }
 
+function updateDataBarang($originalKodeBarang, $newKodeBarang, $namaBarang, $kodeTipe, $idSatuan, $hargaBarang)
+{
+    global $conn;
+    try {
+        $queryUpdate = "UPDATE barang SET kode_barang = ?, nama_barang = ?, kode_tipe = ?, id_satuan = ?, harga_barang = ? WHERE kode_barang = ?";
+        $stmt = mysqli_prepare($conn, $queryUpdate);
+        if ($stmt === false) {
+            throw new Exception('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        // Correct the parameter order to match the query
+        mysqli_stmt_bind_param($stmt, 'ssssds', $newKodeBarang, $namaBarang, $kodeTipe, $idSatuan, $hargaBarang, $originalKodeBarang);
+        $resultUpdate = mysqli_stmt_execute($stmt);
+        if ($resultUpdate === false) {
+            throw new Exception('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        mysqli_stmt_close($stmt);
+        return $resultUpdate;
+    } catch (Exception $e) {
+        echo "Caught exception: " . $e->getMessage();
+    }
+}
+
 function updateDataSatuan($idSatuan, $namaSatuan, $inisialSatuan)
 {
     global $conn;
@@ -255,6 +302,21 @@ function updateDataTipeBarang($originalKodeTipe, $newKodeTipe, $namaTipe)
         return $resultUpdate;
     } catch (Exception $e) {
         echo "Caught exception: " . $e->getMessage();
+    }
+}
+
+function deleteDatabarang($kodeBarang)
+{
+    global $conn;
+    try {
+        $queryDeleteBarang = "DELETE FROM barang WHERE kode_barang = ?";
+        $stmt = mysqli_prepare($conn, $queryDeleteBarang);
+        mysqli_stmt_bind_param($stmt, 's', $kodeBarang);
+        $resultDelete = mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+        return $resultDelete;
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
     }
 }
 

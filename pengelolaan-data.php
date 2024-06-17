@@ -24,6 +24,7 @@
     if (isset($_POST["prosesTambahBarang"])) {
         try {
             // Call the function to add data
+            tambahDataBarang($_POST["kodeBarang"], $_POST["namaBarang"], $_POST["pilihTipe"], $_POST["pilihSatuan"], $_POST["hargaBarang"]);
             header("Location: " . $_SERVER['PHP_SELF']);
             exit;
         } catch (Exception $e) {
@@ -57,8 +58,9 @@
     }
 
     // Proses Edit
-    if (isset($_POST["prosesEditTambahBarang"])) {
+    if (isset($_POST["prosesEditBarang"])) {
         try {
+            updateDataBarang($_POST["originalKodeBarangEdit"], $_POST["kodeBarangEdit"], $_POST["namaBarangEdit"], $_POST["pilihTipeEdit"], $_POST["pilihSatuanEdit"], $_POST["hargaBarangEdit"]);
             header("Location: " . $_SERVER['PHP_SELF']);
             exit;
         } catch (Exception $e) {
@@ -89,7 +91,7 @@
     // Proses Delete
     if (isset($_POST["prosesDeleteBarang"])) {
         try {
-            deleteDataPengguna($_POST["idUser"]);
+            deleteDataBarang($_POST["kodeBarangDelete"]);
             header("Location: " . $_SERVER['PHP_SELF']);
             exit;
         } catch (Exception $e) {
@@ -118,8 +120,9 @@
     }
 
     $resultBarang = displayDataBarang();
-    $resulTipeBarang = displayDataTipeBarang();
+    $resultTipeBarang = displayDataTipeBarang();
     $resultSatuanBarang = displayDataSatuan();
+
     ?>
     <!-- Sidebar -->
     <div class="sidebar">
@@ -184,8 +187,8 @@
                                             echo "<td>" . $row["nama_barang"] . "</td>";
                                             echo "<td>" . formatRupiah($row["harga_barang"]) . "</td>";
                                             echo "<td>";
-                                            echo "<a class='btn btn-primary btn-xs mt-1' data-bs-toggle='modal' data-bs-target='#modalCreateBarang' onclick='populateModal(\"{$row["kode_barang"]}\", \"{$row["nama_barang"]}\", {$row["harga_barang"]})'><i class='bi bi-pencil'></i></a>";
-                                            echo "<a class='btn btn-danger btn-xs mt-1' data-bs-toggle='modal' data-bs-target='#modalDeleteBarang' onclick='populateDeleteModal(\"{$row["kode_barang"]}\")'><i class='bi bi-trash'></i></a>";
+                                            echo "<a class='btn btn-primary btn-xs mt-1' data-bs-toggle='modal' data-bs-target='#modalEditBarang' onclick='populateModalEditBarang(\"{$row["kode_barang"]}\", \"{$row["nama_barang"]}\", \"{$row["kode_tipe"]}\", \"{$row["id_satuan"]}\", \"{$row["harga_barang"]}\")'><i class='bi bi-pencil'></i></a>";
+                                            echo "<a class='btn btn-danger btn-xs mt-1' data-bs-toggle='modal' data-bs-target='#modalDeleteBarang' onclick='populateDeleteModalBarang(\"{$row["kode_barang"]}\", \"{$row["nama_barang"]}\")'><i class='bi bi-trash'></i></a>";
                                             echo "</td>";
                                             echo "</tr>";
                                         }
@@ -225,8 +228,8 @@
                                 <tbody>
                                     <?php
                                     $no = 0;
-                                    if ($resulTipeBarang && $resulTipeBarang->num_rows > 0) {
-                                        while ($row = mysqli_fetch_array($resulTipeBarang)) {
+                                    if ($resultTipeBarang && $resultTipeBarang->num_rows > 0) {
+                                        while ($row = mysqli_fetch_array($resultTipeBarang)) {
                                             $no++;
                                             echo "<tr style='font-size: 13px;'>";
                                             echo "<td>" . $no . "</td>";
@@ -307,118 +310,109 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalLabelCreateBarang">Tambah Pengguna</h5>
+                        <h5 class="modal-title" id="modalLabelCreateBarang">Tambah Barang</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="namaPengguna" class="form-label">Nama Pengguna</label>
-                            <input type="text" class="form-control" name="namaPengguna" id="namaPengguna" placeholder="Masukan Nama Pengguna">
+                            <label for="kodeBarang" class="form-label">Kode Barang<span style="color: red;">*</span></label>
+                            <input type="text" class="form-control" name="kodeBarang" id="kodeBarang" placeholder="Masukan Kode Barang" required>
                         </div>
                         <div class="mb-3">
-                            <label for="namaLengkap" class="form-label">Nama Lengkap</label>
-                            <input type="text" class="form-control" name="namaLengkap" id="namaLengkap" placeholder="Masukan Nama Lengkap">
+                            <label for="namaBarang" class="form-label">Nama Barang<span style="color: red;">*</span></label>
+                            <input type="text" class="form-control" name="namaBarang" id="namaBarang" placeholder="Masukan Nama Barang" required>
                         </div>
                         <div class="mb-3">
-                            <label for="nomorTelepon" class="form-label">Nomor Telepon</label>
-                            <input type="text" class="form-control" name="nomorTelepon" id="nomorTelepon" placeholder="Masukan Nomor Telepon">
-                        </div>
-                        <div class="mb-3">
-                            <label for="alamat" class="form-label">Alamat</label>
-                            <input type="text" class="form-control" name="alamat" id="alamat" placeholder="Masukan Alamat">
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan Email">
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Kata Sandi</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan Kata Sandi">
-                        </div>
-                        <div class="mb-3">
-                            <label for="jabatan" class="form-label">Jabatan</label>
-                            <select class="form-select" aria-label="Default select example" id="jabatan" name="jabatan">
-                                <option selected disabled>Masukkan Jabatan</option>
-                                <?php foreach ($resultRole as $role) : ?>
-                                    <option value="<?php echo htmlspecialchars($role['id_role']); ?>">
-                                        <?php echo htmlspecialchars($role['role_name']); ?>
+                            <label for="pilihTipe" class="form-label">Pilih Tipe<span style="color: red;">*</span></label>
+                            <select class="form-select" aria-label="Default select example" id="pilihTipe" name="pilihTipe" required>
+                                <option selected disabled>Masukan Tipe</option>
+                                <?php foreach ($resultTipeBarang as $tipe) : ?>
+                                    <option value="<?php echo htmlspecialchars($tipe['kode_tipe']); ?>">
+                                        <?php echo htmlspecialchars($tipe['nama_tipe']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="jabatan" class="form-label">Avatar</label>
-                            <input class="form-control" type="file" id="formFile" name="avatar">
+                            <label for="pilihSatuan" class="form-label">Pilih Satuan<span style="color: red;">*</span></label>
+                            <select class="form-select" aria-label="satuan" id="pilihSatuan" name="pilihSatuan" required>
+                                <option selected disabled>Masukan Satuan</option>
+                                <?php foreach ($resultSatuanBarang as $satuan) : ?>
+                                    <option value="<?php echo htmlspecialchars($satuan['id_satuan']); ?>">
+                                        <?php echo htmlspecialchars($satuan['nama_satuan']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="hargaBarang" class="form-label">Harga<span style="color: red;">*</span></label>
+                            <input type="number" class="form-control" name="hargaBarang" id="hargaBarang" placeholder="Masukan Harga Barang" required>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">keluar</button>
-                        <button type="submit" class="btn btn-primary" name="prosesTambah">Simpan</button>
+                        <button type="submit" class="btn btn-primary" name="prosesTambahBarang">Simpan</button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
 
-    <!-- modal edit Barang-->
-    <div class="modal fade" id="exampleModalEdit" tabindex="-1" aria-labelledby="exampleModalLabelEdit" aria-hidden="true">
+    <!-- Modal Edit Barang -->
+    <div class="modal fade" id="modalEditBarang" tabindex="-1" aria-labelledby="modalLabelEditBarang" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabelEdit">Edit Barang</h5>
+                    <h5 class="modal-title" id="modalLabelEditBarang">Edit Barang</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" method="post" action="">
-                        <input type="hidden" id="editKodeBarang" name="idUser">
+                    <form id="editFormBarang" method="post" action="">
+                        <input type="hidden" name="originalKodeBarangEdit" id="originalKodeBarangEdit">
                         <div class="mb-3">
-                            <label for="namaPengguna" class="form-label">Nama Pengguna</label>
-                            <input type="text" class="form-control" name="namaPengguna" id="namaPengguna" placeholder="Masukan Nama Pengguna">
+                            <label for="kodeBarangEdit" class="form-label">Kode Barang<span style="color: red;">*</span></label>
+                            <input type="text" class="form-control" name="kodeBarangEdit" id="kodeBarangEdit" placeholder="Masukan Kode Barang" required>
                         </div>
                         <div class="mb-3">
-                            <label for="namaLengkap" class="form-label">Nama Lengkap</label>
-                            <input type="text" class="form-control" name="namaLengkap" id="namaLengkap" placeholder="Masukan Nama Lengkap">
+                            <label for="namaBarangEdit" class="form-label">Nama Barang<span style="color: red;">*</span></label>
+                            <input type="text" class="form-control" name="namaBarangEdit" id="namaBarangEdit" placeholder="Masukan Nama Barang" required>
                         </div>
                         <div class="mb-3">
-                            <label for="nomorTelepon" class="form-label">Nomor Telepon</label>
-                            <input type="text" class="form-control" name="nomorTelepon" id="nomorTelepon" placeholder="Masukan Nomor Telepon">
-                        </div>
-                        <div class="mb-3">
-                            <label for="alamat" class="form-label">Alamat</label>
-                            <input type="text" class="form-control" name="alamat" id="alamat" placeholder="Masukan Alamat">
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan Email">
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Kata Sandi</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan Kata Sandi">
-                        </div>
-                        <div class="mb-3">
-                            <label for="jabatan" class="form-label">Jabatan</label>
-                            <select class="form-select" aria-label="Default select example" id="jabatan" name="jabatan">
-                                <option selected disabled>Masukkan Jabatan</option>
-                                <?php foreach ($resultRole as $role) : ?>
-                                    <option value="<?php echo htmlspecialchars($role['id_role']); ?>">
-                                        <?php echo htmlspecialchars($role['role_name']); ?>
+                            <label for="pilihTipeEdit" class="form-label">Pilih Tipe<span style="color: red;">*</span></label>
+                            <select class="form-select" aria-label="Default select example" id="pilihTipeEdit" name="pilihTipeEdit" required>
+                                <option selected disabled>Masukan Tipe</option>
+                                <?php foreach ($resultTipeBarang as $tipe) : ?>
+                                    <option value="<?php echo htmlspecialchars($tipe['kode_tipe']); ?>">
+                                        <?php echo htmlspecialchars($tipe['nama_tipe']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="jabatan" class="form-label">Avatar</label>
-                            <input class="form-control" type="file" id="formFile" name="avatar">
+                            <label for="pilihSatuanEdit" class="form-label">Pilih Satuan<span style="color: red;">*</span></label>
+                            <select class="form-select" aria-label="satuan" id="pilihSatuanEdit" name="pilihSatuanEdit" required>
+                                <option selected disabled>Masukan Satuan</option>
+                                <?php foreach ($resultSatuanBarang as $satuan) : ?>
+                                    <option value="<?php echo htmlspecialchars($satuan['id_satuan']); ?>">
+                                        <?php echo htmlspecialchars($satuan['nama_satuan']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="hargaBarangEdit" class="form-label">Harga<span style="color: red;">*</span></label>
+                            <input type="number" class="form-control" name="hargaBarangEdit" id="hargaBarangEdit" placeholder="Masukan Harga Barang" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keluar</button>
+                            <button type="submit" class="btn btn-primary" name="prosesEditBarang">Simpan</button>
                         </div>
                     </form>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">keluar</button>
-                        <button type="submit" class="btn btn-primary" name="prosesTambah">Simpan</button>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- modal create Tipe-->
     <form action="" method="post">
@@ -432,11 +426,11 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="kodeTipe" class="form-label">Kode Tipe<span style="color: red;">*</span></label>
-                            <input type="text" class="form-control" name="kodeTipe" id="kodeTipe" placeholder="Masukan Kode Tipe">
+                            <input type="text" class="form-control" name="kodeTipe" id="kodeTipe" placeholder="Masukan Kode Tipe" required>
                         </div>
                         <div class="mb-3">
                             <label for="namaTipe" class="form-label">Nama Tipe<span style="color: red;">*</span></label>
-                            <input type="text" class="form-control" name="namaTipe" id="namaTipe" placeholder="Masukan Nama Tipe">
+                            <input type="text" class="form-control" name="namaTipe" id="namaTipe" placeholder="Masukan Nama Tipe" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -490,11 +484,11 @@
                         <input type="hidden" id="idSatuan" name="idSatuan" value="<?php echo $newIdSatuan; ?>">
                         <div class="mb-3">
                             <label for="namaSatuan" class="form-label">Nama Satuan<span style="color: red;">*</span></label>
-                            <input type="text" class="form-control" name="namaSatuan" id="namaSatuan" placeholder="Masukan Nama Satuan">
+                            <input type="text" class="form-control" name="namaSatuan" id="namaSatuan" placeholder="Masukan Nama Satuan" required>
                         </div>
                         <div class="mb-3">
                             <label for="inisialSatuan" class="form-label">Inisial Satuan<span style="color: red;">*</span></label>
-                            <input type="text" class="form-control" name="inisialSatuan" id="inisialSatuan" placeholder="Masukan Inisial Satuan">
+                            <input type="text" class="form-control" name="inisialSatuan" id="inisialSatuan" placeholder="Masukan Inisial Satuan" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -536,21 +530,21 @@
     </div>
 
     <!-- Modal delete Barang -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="modalDeleteBarang" tabindex="-1" aria-labelledby="modalLabelDeleteBarang" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <form id="deleteForm" method="post" action="">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                        <h5 class="modal-title" id="modalLabelDeleteBarang">Konfirmasi Hapus</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Apakah Anda yakin ingin menghapus item dengan nama pengguna <span id="deleteItemKode"></span>?
+                        Apakah Anda yakin ingin menghapus barang <span id="namaBarangDelete"></span>?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kembali</button>
-                        <button type="submit" class="btn btn-danger" name="prosesDelete">Hapus</button>
-                        <input type="hidden" name="idUser" id="prosesDelete">
+                        <button type="submit" class="btn btn-danger" name="prosesDeleteBarang">Hapus</button>
+                        <input type="hidden" name="kodeBarangDelete" id="kodeBarangDelete">
                     </div>
                 </form>
             </div>
@@ -609,17 +603,34 @@
             window.location.href = "/login.php";
         }
 
+        // edit
+
+        function populateModalEditBarang(kodeBarang, namaBarang, kodeTipe, idSatuan, hargaBarang) {
+            document.getElementById('originalKodeBarangEdit').value = kodeBarang;
+            document.getElementById('kodeBarangEdit').value = kodeBarang;
+            document.getElementById('namaBarangEdit').value = namaBarang;
+            document.getElementById('pilihTipeEdit').value = kodeTipe;
+            document.getElementById('pilihSatuanEdit').value = idSatuan;
+            document.getElementById('hargaBarangEdit').value = hargaBarang;
+        }
+
         function populateModalEditTipeBarang(kodeTipe, namaTipe) {
             document.getElementById('originalKodeTipeEdit').value = kodeTipe;
             document.getElementById('kodeTipeEdit').value = kodeTipe;
             document.getElementById('namaTipeEdit').value = namaTipe;
-            console.log(kodeTipe, namaTipe); // For debugging purposes
         }
 
         function populateModalEditSatuan(idSatuan, namaSatuan, inisialSatuan) {
             document.getElementById('idSatuanEdit').value = idSatuan;
             document.getElementById('namaSatuanEdit').value = namaSatuan;
             document.getElementById('inisialSatuanEdit').value = inisialSatuan;
+        }
+
+        // delete
+
+        function populateDeleteModalBarang(kodeBarang, namaBarang) {
+            document.getElementById('namaBarangDelete').innerText = namaBarang;
+            document.getElementById('kodeBarangDelete').value = kodeBarang;
         }
 
         function populateDeleteModalTipeBarang(kodeTipe, namaTipe) {

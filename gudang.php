@@ -7,7 +7,7 @@ require_once('config/services.php');
 if (isset($_POST["prosesTambah"])) {
   try {
     // Call the function to add data
-    tambahDataBarang($_POST["kodeBarang"], $_POST["namaBarang"], $_POST["totalKuantitas"], $_POST["hargaBarang"]);
+    tambahDataStokGudang($_POST["kodeBarang"], $_POST["namaBarang"], $_POST["totalKuantitas"], $_POST["hargaBarang"]);
     // Redirect to gudang.php if successful
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
@@ -20,7 +20,7 @@ if (isset($_POST["prosesTambah"])) {
 // Proses edit
 if (isset($_POST["prosesEdit"])) {
   try {
-    updateDataBarang($_POST["kodeBarang"], $_POST["namaBarang"], $_POST["totalKuantitas"], $_POST["hargaBarang"]);
+    updateDataStokGudang($_POST["kodeBarang"], $_POST["namaBarang"], $_POST["totalKuantitas"], $_POST["hargaBarang"]);
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
   } catch (Exception $e) {
@@ -31,7 +31,7 @@ if (isset($_POST["prosesEdit"])) {
 // Proses delete
 if (isset($_POST["prosesDelete"])) {
   try {
-    deleteDataBarang($_POST["kodeBarang"]);
+    deleteDataStokGudang($_POST["kodeBarang"]);
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
   } catch (Exception $e) {
