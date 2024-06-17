@@ -51,7 +51,21 @@
   // Proses edit
   if (isset($_POST["prosesEdit"])) {
     try {
-      updateDataStokGudang($_POST["kodeBarang"], $_POST["namaBarang"], $_POST["totalKuantitas"], $_POST["hargaBarang"]);
+      // Convert formatted price strings to numbers
+      $harga = (int)str_replace('.', '', str_replace('Rp ', '', $_POST["hargaBarangEdit"]));
+      $total = (int)str_replace('.', '', str_replace('Rp ', '', $_POST["totalHargaEdit"]));
+
+      updateDataStokGudang(
+        $_POST["idStokEdit"],
+        $_POST["kodeTipeEdit"],
+        $_POST["idSatuanEdit"],
+        $_POST["pilihBarangEdit"],
+        $_POST["kuantitasEdit"],
+        $harga,
+        $total,
+        $_POST["createdAtEdit"],
+        $_POST["updatedAtEdit"]
+      );
       header("Location: " . $_SERVER['PHP_SELF']);
       exit;
     } catch (Exception $e) {
@@ -176,7 +190,7 @@
         </tr>
       </thead>
       <tbody>
-        <?php if (empty($result)) : ?>
+        <?php if ($result && $result->num_rows < 1) : ?>
           <tr>
             <td colspan="<?php echo count($headerGudang); ?>" class="text-center">Tidak ada data tersedia</td>
           </tr>
@@ -195,7 +209,7 @@
               <td><?php echo formatRupiah($row["total_harga"]); ?></td>
               <td><?php echo formatDate($row["updated_at"]); ?></td>
               <td>
-                <a class='btn btn-primary btn-sm me-2 edit-button' data-bs-toggle='modal' data-bs-target='#modalEditStok' onclick='populateModalEditStok("<?php echo $row["id_stok"]; ?>", "<?php echo $row["kode_barang"]; ?>", "<?php echo $row["harga_barang"]; ?>", "<?php echo $row["total_kuantitas"]; ?>", "<?php echo $row["total_harga"]; ?>")'><i class='bi bi-pencil'></i></a>
+                <a class='btn btn-primary btn-sm me-2 edit-button' data-bs-toggle='modal' data-bs-target='#modalEditStok' onclick='populateModalEditStok("<?php echo $row["id_stok"]; ?>", "<?php echo $row["kode_barang"]; ?>", "<?php echo $row["id_satuan"]; ?>", "<?php echo $row["kode_tipe"]; ?>", "<?php echo $row["total_kuantitas"]; ?>", "<?php echo $row["harga_barang"]; ?>", "<?php echo $row["total_harga"]; ?>", "<?php echo $row["updated_at"]; ?>")'><i class='bi bi-pencil'></i></a>
                 <a class='btn btn-danger btn-sm me-2' data-bs-toggle='modal' data-bs-target='#deleteModalStok' onclick='populateDeleteModalStok("<?php echo $row["id_stok"]; ?>")'><i class='bi bi-trash'></i></a>
               </td>
             </tr>
@@ -269,28 +283,35 @@
         <div class="modal-body">
           <form id="editForm" method="post" action="">
             <input type="hidden" id="idStokEdit" name="idStokEdit">
+            <input type="hidden" id="kodeTipeEdit" name="kodeTipeEdit">
+            <input type="hidden" id="idSatuanEdit" name="idSatuanEdit">
+            <input type="hidden" id="createdAtEdit" name="createdAtEdit" value="<?php echo $createdAt; ?>">
             <div class="mb-3">
               <label for="pilihBarangEdit" class="form-label">Pilih Barang<span style="color: red;">*</span></label>
               <select class="form-select" aria-label="Default select example" id="pilihBarangEdit" name="pilihBarangEdit" required>
                 <option selected disabled>Masukan Barang</option>
                 <?php foreach ($resultBarang as $barang) : ?>
-                  <option value="<?php echo htmlspecialchars($barang['kode_barang']); ?>">
+                  <option value="<?php echo htmlspecialchars($barang['kode_barang']); ?>" data-harga-edit="<?php echo htmlspecialchars($barang['harga_barang']); ?>" data-kode-tipe-edit="<?php echo htmlspecialchars($barang['kode_tipe']); ?>" data-id-satuan-edit="<?php echo htmlspecialchars($barang['id_satuan']); ?>">
                     <?php echo htmlspecialchars($barang['nama_barang']); ?>
                   </option>
                 <?php endforeach; ?>
               </select>
             </div>
             <div class="mb-3">
-              <label for="hargaBarangEdit" class="form-label">Harga<span style="color: red;">*</span></label>
-              <input type="number" class="form-control" id="hargaBarangEdit" name="hargaBarangEdit" placeholder="Harga Barang" required>
+              <label for="kuantitasEdit" class="form-label">Kuantitas<span style="color: red;">*</span></label>
+              <input type="number" class="form-control" id="kuantitasEdit" name="kuantitasEdit" value="1" placeholder="Masukkan Kuantitas" required>
             </div>
             <div class="mb-3">
-              <label for="kuantitasEdit" class="form-label">Kuantitas<span style="color: red;">*</span></label>
-              <input type="number" class="form-control" id="kuantitasEdit" name="kuantitasEdit" placeholder="Masukkan Kuantitas" required>
+              <label for="updatedAtEdit" class="form-label">Tanggal Stok<span style="color: red;">*</span></label>
+              <input type="date" class="form-control" id="updatedAtEdit" name="updatedAtEdit" required>
+            </div>
+            <div class="mb-3">
+              <label for="hargaBarangEdit" class="form-label">Harga<span style="color: red;">*</span></label>
+              <input type="text" class="form-control" id="hargaBarangEdit" name="hargaBarangEdit" placeholder="Pilih barang untuk menampilkan harga" readonly>
             </div>
             <div class="mb-3">
               <label for="totalHargaEdit" class="form-label">Total Harga<span style="color: red;">*</span></label>
-              <input type="number" class="form-control" id="totalHargaEdit" name="totalHargaEdit" placeholder="Total Harga" required>
+              <input type="text" class="form-control" id="totalHargaEdit" name="totalHargaEdit" placeholder="Isi kuantitas untuk menampilkan total" readonly>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keluar</button>
@@ -328,12 +349,19 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous" />
   <script>
-    function populateModalEditStok(idStok, kodeBarang, hargaBarang, kuantitas, totalHarga) {
+    function formatRupiah(amount) {
+      return 'Rp ' + amount.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    }
+
+    function populateModalEditStok(idStok, kodeBarang, idSatuan, kodeTipe, kuantitas, hargaBarang, totalHarga, updatedAt) {
       document.getElementById('idStokEdit').value = idStok;
       document.getElementById('pilihBarangEdit').value = kodeBarang;
-      document.getElementById('hargaBarangEdit').value = hargaBarang;
+      document.getElementById('idSatuanEdit').value = idSatuan;
+      document.getElementById('kodeTipeEdit').value = kodeTipe;
       document.getElementById('kuantitasEdit').value = kuantitas;
-      document.getElementById('totalHargaEdit').value = totalHarga;
+      document.getElementById('hargaBarangEdit').value = formatRupiah(parseFloat(hargaBarang));
+      document.getElementById('totalHargaEdit').value = formatRupiah(parseFloat(totalHarga));
+      document.getElementById('updatedAtEdit').value = updatedAt;
     }
 
     function populateDeleteModalStok(idStok) {
@@ -384,6 +412,56 @@
       if (pilihBarang.value) {
         const selectedOption = pilihBarang.options[pilihBarang.selectedIndex];
         const harga = parseFloat(selectedOption.getAttribute('data-harga')) || 0;
+
+        hargaBarang.value = formatRupiah(harga);
+        kuantitas.value = 1; // Set default quantity to 1
+        updateTotalHarga();
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const pilihBarang = document.getElementById('pilihBarangEdit');
+      const kuantitas = document.getElementById('kuantitasEdit');
+      const hargaBarang = document.getElementById('hargaBarangEdit');
+      const totalHarga = document.getElementById('totalHargaEdit');
+      const kodeTipe = document.getElementById('kodeTipeEdit');
+      const idSatuan = document.getElementById('idSatuanEdit');
+
+      // Function to format number as Rupiah with dots as thousand separators
+      function formatRupiah(amount) {
+        return 'Rp ' + amount.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+      }
+
+      // Update harga and hidden fields when a barang is selected
+      pilihBarang.addEventListener('change', function() {
+        const selectedOption = pilihBarang.options[pilihBarang.selectedIndex];
+        const harga = parseFloat(selectedOption.getAttribute('data-harga-edit')) || 0;
+        const kodeTipeValue = selectedOption.getAttribute('data-kode-tipe-edit');
+        const idSatuanValue = selectedOption.getAttribute('data-id-satuan-edit');
+
+        hargaBarang.value = formatRupiah(harga);
+        kodeTipe.value = kodeTipeValue;
+        idSatuan.value = idSatuanValue;
+        kuantitas.value = 1; // Set default quantity to 1
+        updateTotalHarga();
+      });
+
+      // Update total harga when kuantitas changes
+      kuantitas.addEventListener('input', updateTotalHarga);
+
+      function updateTotalHarga() {
+        const hargaValue = hargaBarang.value.replace(/[^0-9]/g, '');
+        const harga = parseFloat(hargaValue) || 0;
+        const qty = parseInt(kuantitas.value) || 0;
+        const total = harga * qty;
+
+        totalHarga.value = formatRupiah(total);
+      }
+
+      // Initialize total harga on page load if there's a pre-selected barang
+      if (pilihBarang.value) {
+        const selectedOption = pilihBarang.options[pilihBarang.selectedIndex];
+        const harga = parseFloat(selectedOption.getAttribute('data-harga-edit')) || 0;
 
         hargaBarang.value = formatRupiah(harga);
         kuantitas.value = 1; // Set default quantity to 1

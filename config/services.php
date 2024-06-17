@@ -72,13 +72,40 @@ function tambahDataStokGudang($idStok, $kodeTipe, $idSatuan, $pilihBarang, $kuan
     }
 }
 
-function updateDataStokGudang($kodeBarang, $namaBarang, $totalKuantitas, $hargaBarang)
+function updateDataStokGudang($idStok, $kodeTipe, $idSatuan, $pilihBarang, $kuantitas, $harga, $total, $createdAt, $updateAt)
 {
     global $conn;
     try {
-        $queryUpdate = "UPDATE stok_gudang SET nama_barang = ?, total_kuantitas = ?, harga_barang = ? WHERE kode_barang = ?";
+        // Query to get nama_tipe from tipe_barang table
+        $queryTipe = "SELECT nama_tipe FROM tipe_barang WHERE kode_tipe = ?";
+        $stmtTipe = mysqli_prepare($conn, $queryTipe);
+        mysqli_stmt_bind_param($stmtTipe, 's', $kodeTipe);
+        mysqli_stmt_execute($stmtTipe);
+        mysqli_stmt_bind_result($stmtTipe, $namaTipe);
+        mysqli_stmt_fetch($stmtTipe);
+        mysqli_stmt_close($stmtTipe);
+
+        // Query to get nama_satuan and inisial_satuan from satuan table
+        $querySatuan = "SELECT nama_satuan, inisial_satuan FROM satuan WHERE id_satuan = ?";
+        $stmtSatuan = mysqli_prepare($conn, $querySatuan);
+        mysqli_stmt_bind_param($stmtSatuan, 's', $idSatuan);
+        mysqli_stmt_execute($stmtSatuan);
+        mysqli_stmt_bind_result($stmtSatuan, $namaSatuan, $inisialSatuan);
+        mysqli_stmt_fetch($stmtSatuan);
+        mysqli_stmt_close($stmtSatuan);
+
+        // Query to get nama_barang from barang table
+        $queryBarang = "SELECT nama_barang FROM barang WHERE kode_barang = ?";
+        $stmtBarang = mysqli_prepare($conn, $queryBarang);
+        mysqli_stmt_bind_param($stmtBarang, 's', $pilihBarang);
+        mysqli_stmt_execute($stmtBarang);
+        mysqli_stmt_bind_result($stmtBarang, $namaBarang);
+        mysqli_stmt_fetch($stmtBarang);
+        mysqli_stmt_close($stmtBarang);
+
+        $queryUpdate = "UPDATE stok_gudang SET kode_barang = ?, nama_barang = ?, id_satuan = ?, nama_satuan = ?, inisial_satuan = ?, kode_tipe = ?, nama_tipe = ?, total_kuantitas = ?, harga_barang = ?, total_harga = ?, created_at = ?, updated_at = ? WHERE id_stok = ?";
         $stmt = mysqli_prepare($conn, $queryUpdate);
-        mysqli_stmt_bind_param($stmt, 'sids', $namaBarang, $totalKuantitas, $hargaBarang, $kodeBarang);
+        mysqli_stmt_bind_param($stmt, 'ssissssiiisss', $pilihBarang, $namaBarang, $idSatuan, $namaSatuan, $inisialSatuan, $kodeTipe, $namaTipe, $kuantitas, $harga, $total, $createdAt, $updateAt, $idStok);
         $resultUpdate = mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
         return $resultUpdate;
