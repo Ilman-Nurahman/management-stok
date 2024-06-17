@@ -30,26 +30,45 @@ function displayDataStokGudang()
     }
 }
 
-function tambahDataStokGudang($kodeBarang, $namaBarang, $totalKuantitas, $hargaBarang)
+function tambahDataStokGudang($idStok, $kodeTipe, $idSatuan, $pilihBarang, $kuantitas, $harga, $total, $createdAt, $updateAt)
 {
     global $conn;
     try {
-        $queryInsert = "INSERT INTO stok_gudang (kode_barang, nama_barang, total_kuantitas, harga_barang) VALUES (?, ?, ?, ?)";
-        $stmt = mysqli_prepare($conn, $queryInsert);
-        if ($stmt === false) {
-            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
-        }
+        // Query to get nama_tipe from tipe_barang table
+        $queryTipe = "SELECT nama_tipe FROM tipe_barang WHERE kode_tipe = ?";
+        $stmtTipe = mysqli_prepare($conn, $queryTipe);
+        mysqli_stmt_bind_param($stmtTipe, 's', $kodeTipe);
+        mysqli_stmt_execute($stmtTipe);
+        mysqli_stmt_bind_result($stmtTipe, $namaTipe);
+        mysqli_stmt_fetch($stmtTipe);
+        mysqli_stmt_close($stmtTipe);
 
-        mysqli_stmt_bind_param($stmt, 'ssii', $kodeBarang, $namaBarang, $totalKuantitas, $hargaBarang);
-        $resultInsert = mysqli_stmt_execute($stmt);
-        if ($resultInsert === false) {
-            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
-        }
+        // Query to get nama_satuan and inisial_satuan from satuan table
+        $querySatuan = "SELECT nama_satuan, inisial_satuan FROM satuan WHERE id_satuan = ?";
+        $stmtSatuan = mysqli_prepare($conn, $querySatuan);
+        mysqli_stmt_bind_param($stmtSatuan, 's', $idSatuan);
+        mysqli_stmt_execute($stmtSatuan);
+        mysqli_stmt_bind_result($stmtSatuan, $namaSatuan, $inisialSatuan);
+        mysqli_stmt_fetch($stmtSatuan);
+        mysqli_stmt_close($stmtSatuan);
 
-        mysqli_stmt_close($stmt);
-        return $resultInsert;
-    } catch (Error $e) {
-        echo "Caught error: " . $e->getMessage();
+        // Query to get nama_barang from barang table
+        $queryBarang = "SELECT nama_barang FROM barang WHERE kode_barang = ?";
+        $stmtBarang = mysqli_prepare($conn, $queryBarang);
+        mysqli_stmt_bind_param($stmtBarang, 's', $pilihBarang);
+        mysqli_stmt_execute($stmtBarang);
+        mysqli_stmt_bind_result($stmtBarang, $namaBarang);
+        mysqli_stmt_fetch($stmtBarang);
+        mysqli_stmt_close($stmtBarang);
+
+        // Insert data into stok_gudang table
+        $queryInsert = "INSERT INTO stok_gudang (id_stok, kode_tipe, nama_tipe, id_satuan, nama_satuan, inisial_satuan, kode_barang, nama_barang, total_kuantitas, harga_barang, total_harga, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmtInsert = mysqli_prepare($conn, $queryInsert);
+        mysqli_stmt_bind_param($stmtInsert, 'ssssssssiisss', $idStok, $kodeTipe, $namaTipe, $idSatuan, $namaSatuan, $inisialSatuan, $pilihBarang, $namaBarang, $kuantitas, $harga, $total, $createdAt, $updateAt);
+        mysqli_stmt_execute($stmtInsert);
+        mysqli_stmt_close($stmtInsert);
+    } catch (Exception $e) {
+        throw new Exception('Error inserting data: ' . $e->getMessage());
     }
 }
 
@@ -68,13 +87,13 @@ function updateDataStokGudang($kodeBarang, $namaBarang, $totalKuantitas, $hargaB
     }
 }
 
-function deleteDataStokGudang($kodeBarang)
+function deleteDataStokGudang($idStok)
 {
     global $conn;
     try {
-        $queryDelete = "DELETE FROM stok_gudang WHERE kode_barang = ?";
+        $queryDelete = "DELETE FROM stok_gudang WHERE id_stok = ?";
         $stmt = mysqli_prepare($conn, $queryDelete);
-        mysqli_stmt_bind_param($stmt, 's', $kodeBarang);
+        mysqli_stmt_bind_param($stmt, 's', $idStok);
         $resultDelete = mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
         return $resultDelete;

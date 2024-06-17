@@ -27,5 +27,23 @@ function getNewId($conn, $tableName)
 function getCurrentTimestamp()
 {
     $date = new DateTime("now", new DateTimeZone('Asia/Jakarta'));
-    return $date->format('Y-m-d H:i:s');
+    return $date->format('Y-m-d');
 }
+
+function formatDate($tanggal)
+{
+    // Membuat objek DateTime dari tanggal awal
+    $date = new DateTime($tanggal);
+
+    // Array nama bulan dalam bahasa Indonesia
+    $bulan = array(
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    );
+
+    // Memformat ulang tanggal menjadi "DD MMMM YYYY"
+    $formattedDate = $date->format('d ') . $bulan[$date->format('n') - 1] . $date->format(' Y');
+
+    return $formattedDate;
+}
+
