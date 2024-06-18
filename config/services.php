@@ -396,6 +396,35 @@ function deleteDataTipeBarang($kodeTipe)
     }
 }
 
+// ================ MENU TRANSAKSI ================ \\
+function displayDataBarangKeluar()
+{
+    global $conn;
+    try {
+        $queryGet = 'SELECT * FROM barang_keluar';
+        $stmt = mysqli_prepare($conn, $queryGet);
+        if ($stmt === false) {
+            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        $result = mysqli_stmt_execute($stmt);
+        if ($result === false) {
+            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+        if ($result === false) {
+            throw new Error('Getting result set failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        mysqli_stmt_close($stmt);
+        return $result;
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
+
 // ================ MENU MANAGEMEN PENGGUNA ================ \\
 
 function displayDataManajemenPengguna()

@@ -7,8 +7,6 @@
   <title>Transaksi - Management Stok</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-  <!-- Custom CSS -->
-  <link href="./css/stok.css" rel="stylesheet" />
 </head>
 <style>
   @keyframes fadeIn {
@@ -38,7 +36,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    background-color: rgb(0, 162, 255);
+    background-color: #2e3539;
     padding-top: 20px;
     transition: width 0.3s ease;
     /* Smooth transition for sidebar width */
@@ -70,8 +68,9 @@
     padding: 10px;
   }
 
-  .sidebar li.active {
-    background-color: #555;
+  .sidebar li.active a {
+    background-color: #1a73e8;
+    border-radius: 10px;
     /* Active background color */
   }
 
@@ -81,7 +80,7 @@
   }
 
   .sidebar a:hover {
-    background-color: #555;
+    background-color: #1a73e8;
     border-radius: 10px;
     /* Hover background color */
   }
@@ -102,6 +101,8 @@
   require_once('config/services.php');
 
   $current_page = basename($_SERVER['REQUEST_URI']);
+
+  $resultBarangKeluar = displayDataBarangKeluar();
   ?>
   <!-- Sidebar -->
   <div class="sidebar">
@@ -139,45 +140,48 @@
         </button>
       </div>
     </div>
-    <table class="table table-striped table-hover mt-4">
+    <table class="table table-striped table-hover mt-2 animated-card">
       <thead>
         <tr>
-          <th>No</th>
-          <th>Kode Barang</th>
-          <th>Nama Barang</th>
-          <th>Tipe Barang</th>
-          <th>Jumlah Barang</th>
-          <th>Harga Barang (pcs)</th>
-          <th>Laporan di update</th>
-          <th>Aksi</th>
+          <?php
+          $headerBarangKeluar = ["No", "Kode Barang", "Nama Barang", "Tipe", "Satuan", "Kuantitas", "Harga Barang", "Total", "Nama Pelanggan", "No HP", "Keterangan", "Tanggal", "Aksi"];
+          for ($i = 0; $i < count($headerBarangKeluar); $i++) {
+            echo "<th scope='col'>";
+            echo $headerBarangKeluar[$i];
+            echo "</th>";
+          }
+          ?>
         </tr>
       </thead>
       <tbody>
-      </tbody>
-    </table>
-    <!-- barang keluar -->
-    <div class="card pt-2 px-3 mt-5 bg-primary">
-      <div class="d-flex justify-content-between align-items-center">
-        <h4 class="text-white">Barang Masuk</h4>
-        <button type="button" class="btn btn-outline-light mb-2" data-bs-toggle="modal" data-bs-target="#exampleModalCreate">
-          Tambah
-        </button>
-      </div>
-    </div>
-    <table class="table table-striped table-hover mt-4">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Kode Barang</th>
-          <th>Nama Barang</th>
-          <th>Tipe Barang</th>
-          <th>Jumlah Barang</th>
-          <th>Harga Barang (pcs)</th>
-          <th>Laporan di update</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
+        <?php if ($resultBarangKeluar && $resultBarangKeluar->num_rows < 1) : ?>
+          <tr>
+            <td colspan="<?php echo count($headerBarangKeluar); ?>" class="text-center">Tidak ada data tersedia</td>
+          </tr>
+        <?php else : ?>
+          <?php $no = 0; ?>
+          <?php foreach ($resultBarangKeluar as $row) : ?>
+            <?php $no++; ?>
+            <tr>
+              <td><?php echo $no; ?></td>
+              <td><?php echo $row["kode_barang"]; ?></td>
+              <td><?php echo $row["nama_barang"]; ?></td>
+              <td><?php echo $row["nama_tipe"]; ?></td>
+              <td><?php echo $row["nama_satuan"]; ?></td>
+              <td><?php echo $row["kuantitas"]; ?></td>
+              <td><?php echo formatRupiah($row["harga_barang"]); ?></td>
+              <td><?php echo formatRupiah($row["total_harga"]); ?></td>
+              <td><?php echo $row["nama_pelanggan"]; ?></td>
+              <td><?php echo $row["no_hp"]; ?></td>
+              <td><?php echo $row["keterangan"]; ?></td>
+              <td><?php echo formatDate($row["updated_at"]); ?></td>
+              <td>
+                <a class='btn btn-primary btn-sm me-2 edit-button' data-bs-toggle='modal' data-bs-target='#modalEditBarangMasuk' onclick='populateModalEditBarangMasuk("<?php echo $row["id"]; ?>", "<?php echo $row["kode_barang"]; ?>", "<?php echo $row["id_satuan"]; ?>", "<?php echo $row["kode_tipe"]; ?>", "<?php echo $row["total_kuantitas"]; ?>", "<?php echo $row["harga_barang"]; ?>", "<?php echo $row["total_harga"]; ?>", "<?php echo $row["updated_at"]; ?>")'><i class='bi bi-pencil'></i></a>
+                <a class='btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#deleteModalBarangMasuk' onclick='populateDeleteModalBarangMasuk("<?php echo $row["id"]; ?>")'><i class='bi bi-trash'></i></a>
+              </td>
+            </tr>
+          <?php endforeach; ?>
+        <?php endif; ?>
       </tbody>
     </table>
   </div>

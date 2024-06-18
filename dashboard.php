@@ -38,7 +38,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    background-color: rgb(0, 162, 255);
+    background-color: #2e3539;
     padding-top: 20px;
     transition: width 0.3s ease;
     /* Smooth transition for sidebar width */
@@ -70,8 +70,9 @@
     padding: 10px;
   }
 
-  .sidebar li.active {
-    background-color: #555;
+  .sidebar li.active a {
+    background-color: #1a73e8;
+    border-radius: 10px;
     /* Active background color */
   }
 
@@ -81,7 +82,7 @@
   }
 
   .sidebar a:hover {
-    background-color: #555;
+    background-color: #1a73e8;
     border-radius: 10px;
     /* Hover background color */
   }
