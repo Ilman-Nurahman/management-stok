@@ -396,7 +396,7 @@ function deleteDataTipeBarang($kodeTipe)
     }
 }
 
-// ================ MENU TRANSAKSI ================ \\
+// ================ MENU CATATAN TRANSAKSI ================ \\
 function displayDataBarangKeluar()
 {
     global $conn;
@@ -424,6 +424,56 @@ function displayDataBarangKeluar()
     }
 }
 
+function tambahDataBarangKeluar($idBarangKeluar, $pilihBarang, $kodeTipe, $idSatuan, $harga, $kuantitas, $total, $keterangan, $namaPelanggan, $noHp, $tipeKendaraan, $noKendaraan, $iduser, $createdAt, $updatedAt)
+{
+    global $conn;
+    try {
+        // Query to get nama_tipe from tipe_barang table
+        $queryTipe = "SELECT nama_tipe FROM tipe_barang WHERE kode_tipe = ?";
+        $stmtTipe = mysqli_prepare($conn, $queryTipe);
+        mysqli_stmt_bind_param($stmtTipe, 's', $kodeTipe);
+        mysqli_stmt_execute($stmtTipe);
+        mysqli_stmt_bind_result($stmtTipe, $namaTipe);
+        mysqli_stmt_fetch($stmtTipe);
+        mysqli_stmt_close($stmtTipe);
+
+        // Query to get nama_satuan and inisial_satuan from satuan table
+        $querySatuan = "SELECT nama_satuan, inisial_satuan FROM satuan WHERE id_satuan = ?";
+        $stmtSatuan = mysqli_prepare($conn, $querySatuan);
+        mysqli_stmt_bind_param($stmtSatuan, 's', $idSatuan);
+        mysqli_stmt_execute($stmtSatuan);
+        mysqli_stmt_bind_result($stmtSatuan, $namaSatuan, $inisialSatuan);
+        mysqli_stmt_fetch($stmtSatuan);
+        mysqli_stmt_close($stmtSatuan);
+
+        // Query to get nama_barang from barang table
+        $queryBarang = "SELECT nama_barang FROM barang WHERE kode_barang = ?";
+        $stmtBarang = mysqli_prepare($conn, $queryBarang);
+        mysqli_stmt_bind_param($stmtBarang, 's', $pilihBarang);
+        mysqli_stmt_execute($stmtBarang);
+        mysqli_stmt_bind_result($stmtBarang, $namaBarang);
+        mysqli_stmt_fetch($stmtBarang);
+        mysqli_stmt_close($stmtBarang);
+
+        // Query to get username from user table
+        $queryUser = "SELECT username FROM user WHERE id_user = ?";
+        $stmtUser = mysqli_prepare($conn, $queryUser);
+        mysqli_stmt_bind_param($stmtUser, 's', $iduser);
+        mysqli_stmt_execute($stmtUser);
+        mysqli_stmt_bind_result($stmtUser, $username);
+        mysqli_stmt_fetch($stmtUser);
+        mysqli_stmt_close($stmtUser);
+
+        // Insert data into barang_keluar table
+        $queryInsert = "INSERT INTO barang_keluar (id, kode_barang, nama_barang, kode_tipe, nama_tipe, id_satuan, nama_satuan, inisial_satuan, harga_barang, kuantitas, total_harga, keterangan, nama_pelanggan, no_hp, tipe_kendaraan, no_kendaraan, id_user, username, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmtInsert = mysqli_prepare($conn, $queryInsert);
+        mysqli_stmt_bind_param($stmtInsert, 'issssissiiissssssss', $idBarangKeluar, $pilihBarang, $namaBarang, $kodeTipe, $namaTipe, $idSatuan, $namaSatuan, $inisialSatuan, $harga, $kuantitas, $total, $keterangan, $namaPelanggan, $noHp, $tipeKendaraan, $noKendaraan, $iduser, $username, $createdAt, $updatedAt);
+        mysqli_stmt_execute($stmtInsert);
+        mysqli_stmt_close($stmtInsert);
+    } catch (Exception $e) {
+        throw new Exception('Error inserting data: ' . $e->getMessage());
+    }
+}
 
 // ================ MENU MANAGEMEN PENGGUNA ================ \\
 
