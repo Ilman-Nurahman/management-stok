@@ -1,6 +1,97 @@
 <?php
 require_once('config/connection.php');
 
+// ================ MENU DASHBOARD ================ \\
+function displayTotalKuantitas()
+{
+    global $conn;
+    try {
+        // Query untuk menjumlahkan total_kuantitas
+        $queryGet = 'SELECT SUM(total_kuantitas) as total_kuantitas FROM stok_gudang';
+        $stmt = mysqli_prepare($conn, $queryGet);
+        if ($stmt === false) {
+            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        $result = mysqli_stmt_execute($stmt);
+        if ($result === false) {
+            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+        if ($result === false) {
+            throw new Error('Getting result set failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        $row = mysqli_fetch_assoc($result);
+        mysqli_stmt_close($stmt);
+
+        return $row['total_kuantitas'];
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
+function displayTotalOmset()
+{
+    global $conn;
+    try {
+        // Query untuk menjumlahkan total_kuantitas
+        $queryGet = 'SELECT SUM(total_harga) as total_harga FROM barang_keluar';
+        $stmt = mysqli_prepare($conn, $queryGet);
+        if ($stmt === false) {
+            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        $result = mysqli_stmt_execute($stmt);
+        if ($result === false) {
+            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+        if ($result === false) {
+            throw new Error('Getting result set failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        $row = mysqli_fetch_assoc($result);
+        mysqli_stmt_close($stmt);
+
+        return $row['total_harga'];
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
+function displayTotalBarangTerjual()
+{
+    global $conn;
+    try {
+        // Query untuk menjumlahkan total_kuantitas
+        $queryGet = 'SELECT SUM(kuantitas) as kuantitas FROM barang_keluar';
+        $stmt = mysqli_prepare($conn, $queryGet);
+        if ($stmt === false) {
+            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        $result = mysqli_stmt_execute($stmt);
+        if ($result === false) {
+            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        $result = mysqli_stmt_get_result($stmt);
+        if ($result === false) {
+            throw new Error('Getting result set failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        $row = mysqli_fetch_assoc($result);
+        mysqli_stmt_close($stmt);
+
+        return $row['kuantitas'];
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
 // ================ MENU GUDANG ================ \\
 
 function displayDataStokGudang()

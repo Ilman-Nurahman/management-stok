@@ -9,6 +9,7 @@
   <!-- Include Chart.js library -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <style>
   @keyframes fadeIn {
@@ -94,6 +95,47 @@
     transition: margin-left 0.3s ease;
     /* Smooth transition for content margin adjustment */
   }
+
+  .icon-large {
+    font-size: 3em;
+    /* Atur ukuran sesuai kebutuhan Anda */
+  }
+
+  .card {
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+  }
+
+  .card-hover:hover {
+    transform: scale(1.05);
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  .icon-large {
+    font-size: 3em;
+    color: #007bff;
+    /* Ubah warna sesuai kebutuhan Anda */
+  }
+
+  .card-title {
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+
+  .card-text {
+    font-size: 1.2em;
+    color: #555;
+  }
+
+  .text-green {
+    color: green;
+    font-weight: bold;
+  }
 </style>
 
 <body>
@@ -103,6 +145,67 @@
   require_once('config/services.php');
 
   $current_page = basename($_SERVER['REQUEST_URI']);
+
+  $resultUser = displayDataManajemenPengguna();
+  if ($resultUser instanceof mysqli_result) {
+    $userCount = $resultUser->num_rows;
+  } else {
+    // Jika $resultUser bukan objek mysqli_result, set nilai default
+    $userCount = 0;
+  }
+
+  $resultBarang = displayDataBarang();
+  if ($resultBarang instanceof mysqli_result) {
+    $userCountBarang = $resultBarang->num_rows;
+  } else {
+    // Jika $resultUser bukan objek mysqli_result, set nilai default
+    $userCountBarang = 0;
+  }
+
+  $resultTipeBarang = displayDataTipeBarang();
+  if ($resultTipeBarang instanceof mysqli_result) {
+    $userCountTipeBarang = $resultTipeBarang->num_rows;
+  } else {
+    // Jika $resultUser bukan objek mysqli_result, set nilai default
+    $userCountTipeBarang = 0;
+  }
+
+  $resultKuantitas = displayTotalKuantitas();
+  $resultOmset = displayTotalOmset();
+  $resultBarangDiJual = displayTotalBarangTerjual();
+
+  if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    // Clear filter jika parameter clear=true diberikan
+    if (isset($_GET["clear"]) && $_GET["clear"] == "true") {
+      unset($_POST["filterDate"]); // Hapus filterDate dari POST data
+      unset($_GET["clear"]); // Hapus parameter clear dari URL
+      // Redirect kembali ke halaman ini (opsional, tergantung kebutuhan)
+      header("Location: " . $_SERVER['PHP_SELF']);
+      exit; // Pastikan keluar dari skrip setelah melakukan redirect
+    }
+
+    // Proses filter jika filterDate ada dalam POST dan tidak kosong
+    if (isset($_POST["filterDate"]) && !empty($_POST["filterDate"])) {
+      $filterDate = $_POST["filterDate"];
+
+      $filteredResults = []; // Array untuk menyimpan hasil yang difilter
+
+      // Loop melalui hasil dari fungsi displayDataStokGudang()
+      while ($row = mysqli_fetch_assoc($result)) {
+        // Konversi format tanggal dari database
+        $tanggalStok = date("Y-m-d", strtotime($row['updated_at']));
+
+        // Filter data berdasarkan tanggal yang sesuai
+        if ($tanggalStok == $filterDate) {
+          $filteredResults[] = $row;
+        }
+      }
+
+      // Ganti $result dengan hasil yang telah difilter
+      $result = $filteredResults;
+    }
+  }
   ?>
   <!-- Sidebar -->
   <div class="sidebar">
@@ -132,12 +235,78 @@
       </div>
     </nav>
     <!-- content -->
-    <div class="card pt-2 px-3 bg-primary" style="margin-top: 3%">
-      <div class="d-flex justify-content-between align-items-center">
-        <h4 class="text-white">Barang Masuk Perbulan</h4>
+    <div class="d-flex justify-content-end mb-3" style="margin-top: 2%;">
+      <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="d-flex">
+        <div class="input-group">
+          <input type="date" class="form-control me-2 mb-2" id="filterDate" name="filterDate" style="width: 30%;" value="<?php echo isset($_POST['filterDate']) ? htmlspecialchars($_POST['filterDate']) : ''; ?>">
+          <button type="submit" class="btn btn-success mb-2">Filte Data</button>
+          <?php if (isset($_POST['filterDate']) && !empty($_POST['filterDate'])) : ?>
+            <a href="?clear=true" class="btn btn-secondary mb-2 ms-2">Clear Filter</a>
+          <?php endif; ?>
+        </div>
+      </form>
+    </div>
+
+    <div class="row mt-4 animated-card">
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="card card-hover text-center">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-chart-line icon-large"></i></h5>
+            <h5 class="card-title mt-3">Omset</h5>
+            <p class="card-text mt-2 text-green"><?php echo formatRupiah($resultOmset) ?></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="card card-hover text-center">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-box icon-large"></i></h5>
+            <h5 class="card-title mt-3">Total</h5>
+            <p class="card-text mt-2"><?php echo $resultBarangDiJual ?> Barang Terjual</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="card card-hover text-center">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-cubes icon-large"></i></h5>
+            <h5 class="card-title mt-3">Total</h5>
+            <p class="card-text mt-2"><?php echo $userCountBarang ?> Barang</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="row mt-4 animated-card">
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="card card-hover text-center">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-tags icon-large"></i></h5>
+            <h5 class="card-title mt-3">Total</h5>
+            <p class="card-text mt-2"><?php echo $userCountTipeBarang ?> Tipe Barang</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="card card-hover text-center">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-boxes icon-large"></i></h5>
+            <h5 class="card-title mt-3">Total</h5>
+            <p class="card-text mt-2"><?php echo $resultKuantitas ?> Kuantitas Stok Barang</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="card card-hover text-center">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-user icon-large"></i></h5>
+            <h5 class="card-title mt-3">Total</h5>
+            <p class="card-text mt-2"><?php echo $userCount ?> Pengguna</p>
+          </div>
+        </div>
       </div>
     </div>
-    <canvas id="myChart"></canvas>
   </div>
   <!-- Option 1: Bootstrap Bundle with Popper -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
@@ -147,36 +316,6 @@
     function toLogin() {
       window.location.href = "/login.php";
     }
-
-    var ctx = document.getElementById("myChart").getContext("2d");
-    var myChart = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: ["Februari", "Maret", "April"],
-        datasets: [{
-          label: "Total",
-          data: [60, 40, 80],
-          backgroundColor: [
-            "rgba(255, 99, 132, 0.2)",
-            "rgba(54, 162, 235, 0.2)",
-            "rgba(255, 206, 86, 0.2)",
-          ],
-          borderColor: [
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-          ],
-          borderWidth: 1,
-        }, ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-      },
-    });
   </script>
 </body>
 
