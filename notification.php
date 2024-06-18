@@ -107,7 +107,7 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="d-flex justify-content-center mb-4">
-      <img src="./assets/Logo-Bengkel.png" width="200" alt="logo-bengkel" />
+      <img src="./assets/Logo-Bengkel.png" width="200" height="100" alt="logo-bengkel" />
     </div>
     <ul>
       <li class="<?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>"><a href="dashboard.php">Dashboard</a></li>
