@@ -318,8 +318,8 @@
                 <td><?php echo $row["keterangan"]; ?></td>
                 <td><?php echo formatDate($row["updated_at"]); ?></td>
                 <td>
-                  <a class='btn btn-primary btn-sm me-2 edit-button' data-bs-toggle='modal' data-bs-target='#modalEditBarangKeluar' onclick='populateModalEditBarangKeluar("<?php echo $row["id"]; ?>", "<?php echo $row["kode_barang"]; ?>", "<?php echo $row["id_satuan"]; ?>", "<?php echo $row["kode_tipe"]; ?>", "<?php echo $row["total_kuantitas"]; ?>", "<?php echo $row["harga_barang"]; ?>", "<?php echo $row["total_harga"]; ?>", "<?php echo $row["updated_at"]; ?>")'><i class='bi bi-pencil'></i></a>
-                  <a class='btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#deleteModalBarangKeluar' onclick='populateDeleteModalBarangKeluar("<?php echo $row["id"]; ?>")'><i class='bi bi-trash'></i></a>
+                  <a class='btn btn-primary btn-sm me-2 edit-button' data-bs-toggle='modal' data-bs-target='#modalEditBarangKeluar' onclick='populateModalEditBarangKeluar("<?php echo $row["id_barang_keluar"]; ?>", "<?php echo $row["kode_barang"]; ?>", "<?php echo $row["id_satuan"]; ?>", "<?php echo $row["kode_tipe"]; ?>", "<?php echo $row["total_kuantitas"]; ?>", "<?php echo $row["harga_barang"]; ?>", "<?php echo $row["total_harga"]; ?>", "<?php echo $row["updated_at"]; ?>")'><i class='bi bi-pencil'></i></a>
+                  <a class='btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#deleteModalBarangKeluar' onclick='populateDeleteModalBarangKeluar("<?php echo $row["id_barang_keluar"]; ?>")'><i class='bi bi-trash'></i></a>
                 </td>
               </tr>
             <?php endforeach; ?>
