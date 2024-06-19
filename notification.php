@@ -110,6 +110,16 @@
     exit;
   }
 
+  $user = getUserByToken($token);
+
+  if (!$user) {
+    // Redirect to login if token is invalid
+    header('Location: login.php');
+    exit;
+  }
+
+  $role_id = $user['id_role'];
+
   $result = displayDataAktivitasPengguna();
   ?>
   <!-- Sidebar -->

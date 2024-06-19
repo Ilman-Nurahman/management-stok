@@ -112,6 +112,24 @@
 
   $current_page = basename($_SERVER['REQUEST_URI']);
 
+  $token = isset($_COOKIE['auth_token']) ? $_COOKIE['auth_token'] : '';
+
+  if (!$token || !verifyToken($token)) {
+    // If token is not set or invalid, redirect to login page
+    header('Location: login.php');
+    exit;
+  }
+
+  $user = getUserByToken($token);
+
+  if (!$user) {
+    // Redirect to login if token is invalid
+    header('Location: login.php');
+    exit;
+  }
+
+  $role_id = $user['id_role'];
+
   $newIdBarangKeluar = getNewId($conn, 'barang_keluar');
   $createdAt = getCurrentTimestamp();
 

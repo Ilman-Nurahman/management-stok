@@ -154,6 +154,16 @@
     exit;
   }
 
+  $user = getUserByToken($token);
+
+  if (!$user) {
+    // Redirect to login if token is invalid
+    header('Location: login.php');
+    exit;
+  }
+
+  $role_id = $user['id_role'];
+
   $resultUser = displayDataManajemenPengguna();
   if ($resultUser instanceof mysqli_result) {
     $userCount = $resultUser->num_rows;

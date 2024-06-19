@@ -644,6 +644,21 @@ function verifyToken($token) {
     return $user ? true : false;
 }
 
+function getUserByToken($token) {
+    global $conn;
+    $query = 'SELECT * FROM user WHERE token = ?';
+    $stmt = mysqli_prepare($conn, $query);
+    if ($stmt === false) {
+        throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+    }
+    mysqli_stmt_bind_param($stmt, 's', $token);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $user = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+    return $user;
+}
+
 function displayDataManajemenPengguna()
 {
     global $conn;

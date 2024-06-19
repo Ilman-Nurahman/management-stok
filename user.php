@@ -123,6 +123,16 @@
       exit;
     }
 
+    $user = getUserByToken($token);
+
+    if (!$user) {
+      // Redirect to login if token is invalid
+      header('Location: login.php');
+      exit;
+    }
+  
+    $role_id = $user['id_role'];
+
     // Get new ID for user
     $newId = getNewId($conn, 'user');
     $createdAt = getCurrentTimestamp();
