@@ -139,22 +139,24 @@
       // Convert formatted price strings to numbers
       $harga = (int)str_replace('.', '', str_replace('Rp ', '', $_POST["hargaBarang"]));
       $total = (int)str_replace('.', '', str_replace('Rp ', '', $_POST["totalHarga"]));
+      // Generate a unique ID for id_barang_keluar
+      $idBarangKeluar = uniqid('BK_', true);
 
       // Call the function to add data
       tambahDataBarangKeluar(
-        $_POST["idBarangKeluar"],
+        $idBarangKeluar,
         $_POST["pilihBarang"],
         $_POST["kodeTipe"],
-        $_POST["idSatuan"],
+        $_POST['idSatuan'],
         $harga,
-        $_POST["kuantitas"],
+        $_POST['kuantitas'],
         $total,
         $_POST["keterangan"],
         $_POST["namaPelanggan"],
         $_POST["noHp"],
         $_POST["pilihKendaraan"],
         $_POST["noKendaraan"],
-        $_POST["idUser"],
+        $_POST['idUser'],
         $_POST["createdAt"],
         $_POST["updatedAt"]
       );

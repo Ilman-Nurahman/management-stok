@@ -519,23 +519,18 @@ function tambahDataBarangKeluar($idBarangKeluar, $pilihBarang, $kodeTipe, $idSat
 {
     global $conn;
     try {
-        // Query to get nama_tipe from tipe_barang table
-        $queryTipe = "SELECT nama_tipe FROM tipe_barang WHERE kode_tipe = ?";
-        $stmtTipe = mysqli_prepare($conn, $queryTipe);
-        mysqli_stmt_bind_param($stmtTipe, 's', $kodeTipe);
-        mysqli_stmt_execute($stmtTipe);
-        mysqli_stmt_bind_result($stmtTipe, $namaTipe);
-        mysqli_stmt_fetch($stmtTipe);
-        mysqli_stmt_close($stmtTipe);
+        // Query to check if id_barang_keluar already exists
+        $queryCheck = "SELECT id_barang_keluar FROM barang_keluar WHERE id_barang_keluar = ?";
+        $stmtCheck = mysqli_prepare($conn, $queryCheck);
+        mysqli_stmt_bind_param($stmtCheck, 's', $idBarangKeluar);
+        mysqli_stmt_execute($stmtCheck);
+        mysqli_stmt_store_result($stmtCheck);
 
-        // Query to get nama_satuan and inisial_satuan from satuan table
-        $querySatuan = "SELECT nama_satuan, inisial_satuan FROM satuan WHERE id_satuan = ?";
-        $stmtSatuan = mysqli_prepare($conn, $querySatuan);
-        mysqli_stmt_bind_param($stmtSatuan, 's', $idSatuan);
-        mysqli_stmt_execute($stmtSatuan);
-        mysqli_stmt_bind_result($stmtSatuan, $namaSatuan, $inisialSatuan);
-        mysqli_stmt_fetch($stmtSatuan);
-        mysqli_stmt_close($stmtSatuan);
+        if (mysqli_stmt_num_rows($stmtCheck) > 0) {
+            throw new Exception('Error: id_barang_keluar ' . $idBarangKeluar . ' already exists.');
+        }
+
+        mysqli_stmt_close($stmtCheck);
 
         // Query to get nama_barang from barang table
         $queryBarang = "SELECT nama_barang FROM barang WHERE kode_barang = ?";
@@ -546,6 +541,41 @@ function tambahDataBarangKeluar($idBarangKeluar, $pilihBarang, $kodeTipe, $idSat
         mysqli_stmt_fetch($stmtBarang);
         mysqli_stmt_close($stmtBarang);
 
+        // Check if $namaBarang is NULL and handle it
+        if ($namaBarang === NULL) {
+            throw new Exception('Error: Barang with kode ' . $pilihBarang . ' not found.');
+        }
+
+        // Query to get nama_tipe from tipe_barang table
+        $queryTipe = "SELECT nama_tipe FROM tipe_barang WHERE kode_tipe = ?";
+        $stmtTipe = mysqli_prepare($conn, $queryTipe);
+        mysqli_stmt_bind_param($stmtTipe, 's', $kodeTipe);
+        mysqli_stmt_execute($stmtTipe);
+        mysqli_stmt_bind_result($stmtTipe, $namaTipe);
+        mysqli_stmt_fetch($stmtTipe);
+
+        // Check if $namaTipe is NULL and handle it
+        if ($namaTipe === NULL) {
+            throw new Exception('Error: Tipe with kode ' . $kodeTipe . ' not found.');
+        }
+
+        mysqli_stmt_close($stmtTipe);
+
+        // Query to get nama_satuan and inisial_satuan from satuan table
+        $querySatuan = "SELECT nama_satuan, inisial_satuan FROM satuan WHERE id_satuan = ?";
+        $stmtSatuan = mysqli_prepare($conn, $querySatuan);
+        mysqli_stmt_bind_param($stmtSatuan, 's', $idSatuan);
+        mysqli_stmt_execute($stmtSatuan);
+        mysqli_stmt_bind_result($stmtSatuan, $namaSatuan, $inisialSatuan);
+        mysqli_stmt_fetch($stmtSatuan);
+
+        // Check if $namaSatuan or $inisialSatuan is NULL and handle it
+        if ($namaSatuan === NULL || $inisialSatuan === NULL) {
+            throw new Exception('Error: Satuan with ID ' . $idSatuan . ' not found or missing inisial_satuan.');
+        }
+
+        mysqli_stmt_close($stmtSatuan);
+
         // Query to get username from user table
         $queryUser = "SELECT username FROM user WHERE id_user = ?";
         $stmtUser = mysqli_prepare($conn, $queryUser);
@@ -553,13 +583,28 @@ function tambahDataBarangKeluar($idBarangKeluar, $pilihBarang, $kodeTipe, $idSat
         mysqli_stmt_execute($stmtUser);
         mysqli_stmt_bind_result($stmtUser, $username);
         mysqli_stmt_fetch($stmtUser);
+
+        // Check if $username is NULL and handle it
+        if ($username === NULL) {
+            throw new Exception('Error: Username for user with ID ' . $iduser . ' not found.');
+        }
+
         mysqli_stmt_close($stmtUser);
 
         // Insert data into barang_keluar table
-        $queryInsert = "INSERT INTO barang_keluar (id, kode_barang, nama_barang, kode_tipe, nama_tipe, id_satuan, nama_satuan, inisial_satuan, harga_barang, kuantitas, total_harga, keterangan, nama_pelanggan, no_hp, tipe_kendaraan, no_kendaraan, id_user, username, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $queryInsert = "INSERT INTO barang_keluar (id_barang_keluar, kode_barang, nama_barang, kode_tipe, nama_tipe, id_satuan, nama_satuan, inisial_satuan, harga_barang, kuantitas, total_harga, keterangan, nama_pelanggan, no_hp, tipe_kendaraan, no_kendaraan, id_user, username, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmtInsert = mysqli_prepare($conn, $queryInsert);
-        mysqli_stmt_bind_param($stmtInsert, 'issssissiiissssssss', $idBarangKeluar, $pilihBarang, $namaBarang, $kodeTipe, $namaTipe, $idSatuan, $namaSatuan, $inisialSatuan, $harga, $kuantitas, $total, $keterangan, $namaPelanggan, $noHp, $tipeKendaraan, $noKendaraan, $iduser, $username, $createdAt, $updatedAt);
-        mysqli_stmt_execute($stmtInsert);
+
+        if (!$stmtInsert) {
+            throw new Exception('Error preparing statement: ' . mysqli_error($conn));
+        }
+
+        mysqli_stmt_bind_param($stmtInsert, 'ssssssssisisssssssss', $idBarangKeluar, $pilihBarang, $namaBarang, $kodeTipe, $namaTipe, $idSatuan, $namaSatuan, $inisialSatuan, $harga, $kuantitas, $total, $keterangan, $namaPelanggan, $noHp, $tipeKendaraan, $noKendaraan, $iduser, $username, $createdAt, $updatedAt);
+
+        if (!mysqli_stmt_execute($stmtInsert)) {
+            throw new Exception('Error executing statement: ' . mysqli_stmt_error($stmtInsert));
+        }
+
         mysqli_stmt_close($stmtInsert);
     } catch (Exception $e) {
         throw new Exception('Error inserting data: ' . $e->getMessage());
@@ -629,7 +674,8 @@ function authenticateUser($email, $password)
 }
 
 // Function to verify token
-function verifyToken($token) {
+function verifyToken($token)
+{
     global $conn;
     $query = 'SELECT * FROM user WHERE token = ?';
     $stmt = mysqli_prepare($conn, $query);
@@ -644,7 +690,8 @@ function verifyToken($token) {
     return $user ? true : false;
 }
 
-function getUserByToken($token) {
+function getUserByToken($token)
+{
     global $conn;
     $query = 'SELECT * FROM user WHERE token = ?';
     $stmt = mysqli_prepare($conn, $query);

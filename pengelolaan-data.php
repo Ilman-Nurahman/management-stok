@@ -159,19 +159,19 @@
     $token = isset($_COOKIE['auth_token']) ? $_COOKIE['auth_token'] : '';
 
     if (!$token || !verifyToken($token)) {
-      // If token is not set or invalid, redirect to login page
-      header('Location: login.php');
-      exit;
+        // If token is not set or invalid, redirect to login page
+        header('Location: login.php');
+        exit;
     }
 
     $user = getUserByToken($token);
 
     if (!$user) {
-      // Redirect to login if token is invalid
-      header('Location: login.php');
-      exit;
+        // Redirect to login if token is invalid
+        header('Location: login.php');
+        exit;
     }
-  
+
     $role_id = $user['id_role'];
 
     $newIdSatuan = getNewId($conn, 'satuan');
@@ -205,7 +205,8 @@
     if (isset($_POST["prosesTambahSatuanBarang"])) {
         try {
             // Call the function to add data
-            tambahDataSatuan($_POST["idSatuan"], $_POST["namaSatuan"], $_POST["inisialSatuan"]);
+            $idSatuan = uniqid('SN_', true);
+            tambahDataSatuan($idSatuan, $_POST["namaSatuan"], $_POST["inisialSatuan"]);
             header("Location: " . $_SERVER['PHP_SELF']);
             exit;
         } catch (Exception $e) {
