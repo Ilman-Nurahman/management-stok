@@ -566,7 +566,83 @@ function tambahDataBarangKeluar($idBarangKeluar, $pilihBarang, $kodeTipe, $idSat
     }
 }
 
+function deleteDataBarangKeluar($idBarangKeluar)
+{
+    global $conn;
+    try {
+        $queryDeleteBarangKeluar = "DELETE FROM barang_keluar WHERE id_barang_keluar = ?";
+        $stmt = mysqli_prepare($conn, $queryDeleteBarangKeluar);
+        mysqli_stmt_bind_param($stmt, 's', $idBarangKeluar);
+        $resultDelete = mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+        return $resultDelete;
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+}
+
 // ================ MENU MANAGEMEN PENGGUNA ================ \\
+
+// Function to authenticate user
+function authenticateUser($email, $password)
+{
+    global $conn;
+    try {
+        // Prepare the SQL statement
+        $query = 'SELECT * FROM user WHERE email = ?';
+        $stmt = mysqli_prepare($conn, $query);
+        if ($stmt === false) {
+            throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+        }
+
+        // Bind the email parameter
+        mysqli_stmt_bind_param($stmt, 's', $email);
+
+        // Execute the statement
+        $result = mysqli_stmt_execute($stmt);
+        if ($result === false) {
+            throw new Error('Statement execution failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        // Get the result
+        $result = mysqli_stmt_get_result($stmt);
+        if ($result === false) {
+            throw new Error('Getting result set failed: ' . mysqli_stmt_error($stmt));
+        }
+
+        // Fetch the user data
+        $user = mysqli_fetch_assoc($result);
+
+        // Close the statement
+        mysqli_stmt_close($stmt);
+
+        // If user is found, verify the password
+        if ($user && password_verify($password, $user['password_user'])) {
+            return true;
+        }
+
+        return false;
+    } catch (Error $e) {
+        echo "Caught error: " . $e->getMessage();
+    }
+    return false;
+}
+
+// Function to verify token
+function verifyToken($token) {
+    global $conn;
+    $query = 'SELECT * FROM user WHERE token = ?';
+    $stmt = mysqli_prepare($conn, $query);
+    if ($stmt === false) {
+        throw new Error('Statement preparation failed: ' . mysqli_error($conn));
+    }
+    mysqli_stmt_bind_param($stmt, 's', $token);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $user = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+    return $user ? true : false;
+}
 
 function displayDataManajemenPengguna()
 {

@@ -156,6 +156,14 @@
 
     $current_page = basename($_SERVER['REQUEST_URI']);
 
+    $token = isset($_COOKIE['auth_token']) ? $_COOKIE['auth_token'] : '';
+
+    if (!$token || !verifyToken($token)) {
+      // If token is not set or invalid, redirect to login page
+      header('Location: login.php');
+      exit;
+    }
+
     $newIdSatuan = getNewId($conn, 'satuan');
     $createdAt = getCurrentTimestamp();
 

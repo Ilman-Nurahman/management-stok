@@ -177,7 +177,7 @@
   // Proses delete
   if (isset($_POST["prosesDelete"])) {
     try {
-      deleteDataStokGudang($_POST["idBarangKeluarDeleteInput"]);
+      deleteDataBarangKeluar($_POST["idBarangKeluarDeleteInput"]);
       header("Location: " . $_SERVER['PHP_SELF']);
       exit;
     } catch (Exception $e) {
@@ -318,8 +318,8 @@
                 <td><?php echo $row["keterangan"]; ?></td>
                 <td><?php echo formatDate($row["updated_at"]); ?></td>
                 <td>
-                  <a class='btn btn-primary btn-sm me-2 edit-button' data-bs-toggle='modal' data-bs-target='#modalEditBarangKeluar' onclick='populateModalEditBarangKeluar("<?php echo $row["id_barang_keluar"]; ?>", "<?php echo $row["kode_barang"]; ?>", "<?php echo $row["id_satuan"]; ?>", "<?php echo $row["kode_tipe"]; ?>", "<?php echo $row["total_kuantitas"]; ?>", "<?php echo $row["harga_barang"]; ?>", "<?php echo $row["total_harga"]; ?>", "<?php echo $row["updated_at"]; ?>")'><i class='bi bi-pencil'></i></a>
-                  <a class='btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#deleteModalBarangKeluar' onclick='populateDeleteModalBarangKeluar("<?php echo $row["id_barang_keluar"]; ?>")'><i class='bi bi-trash'></i></a>
+                  <a class='btn btn-primary btn-sm me-2 edit-button' data-bs-toggle='modal' data-bs-target='#modalEditTransaksi' onclick='populateModalEditTransaksi("<?php echo $row["id_barang_keluar"]; ?>", "<?php echo $row["kode_barang"]; ?>", "<?php echo $row["kode_tipe"]; ?>", "<?php echo $row["id_satuan"]; ?>", "<?php echo $row["harga_barang"]; ?>", "<?php echo $row["kuantitas"]; ?>", "<?php echo $row["total_harga"]; ?>", "<?php echo $row["keterangan"]; ?>", "<?php echo $row["nama_pelanggan"]; ?>", "<?php echo $row["no_hp"]; ?>", "<?php echo $row["tipe_kendaraan"]; ?>", "<?php echo $row["no_kendaraan"]; ?>", "<?php echo $row["id_user"]; ?>", "<?php echo $row["updated_at"]; ?>")'><i class='bi bi-pencil'></i></a>
+                  <a class='btn btn-danger btn-sm' data-bs-toggle='modal' data-bs-target='#deleteModalTransaksi' onclick='populateDeleteModalTransaksi("<?php echo $row["id_barang_keluar"]; ?>")'><i class='bi bi-trash'></i></a>
                 </td>
               </tr>
             <?php endforeach; ?>
@@ -411,11 +411,11 @@
 
 
   <!-- modal edit -->
-  <div class="modal fade" id="modalEditBarangKeluar" tabindex="-1" aria-labelledby="modalLabelEditBarangKeluar" aria-hidden="true">
+  <div class="modal fade" id="modalEditTransaksi" tabindex="-1" aria-labelledby="modalLabelEditBarangKeluar" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalLabelEditBarangKeluar">Edit Barang</h5>
+          <h5 class="modal-title" id="modalLabelEditBarangKeluar">Edit Transaksi</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -423,6 +423,7 @@
             <input type="hidden" id="idBarangKeluarEdit" name="idBarangKeluarEdit">
             <input type="hidden" id="kodeTipeEdit" name="kodeTipeEdit">
             <input type="hidden" id="idSatuanEdit" name="idSatuanEdit">
+            <input type="hidden" id="idUserEdit" name="idUserEdit">
             <input type="hidden" id="createdAtEdit" name="createdAtEdit" value="<?php echo $createdAt; ?>">
             <div class="mb-3">
               <label for="pilihBarangEdit" class="form-label">Pilih Barang<span style="color: red;">*</span></label>
@@ -447,6 +448,18 @@
               </select>
             </div>
             <div class="mb-3">
+              <label for="noKendaraanEdit" class="form-label">No Kendaraan<span style="color: red;">*</span></label>
+              <input type="text" class="form-control" id="noKendaraanEdit" name="noKendaraanEdit" placeholder="Masukkan Nomor Kendaraan" required>
+            </div>
+            <div class="mb-3">
+              <label for="namaPelangganEdit" class="form-label">Nama Pelanggan<span style="color: red;">*</span></label>
+              <input type="text" class="form-control" id="namaPelangganEdit" name="namaPelangganEdit" placeholder="Masukkan Nama Pelanggan" required>
+            </div>
+            <div class="mb-3">
+              <label for="noHpEdit" class="form-label">No Telepon<span style="color: red;">*</span></label>
+              <input type="text" class="form-control" id="noHpEdit" name="noHpEdit" placeholder="Masukkan Nomor Telepon" required>
+            </div>
+            <div class="mb-3">
               <label for="kuantitasEdit" class="form-label">Kuantitas<span style="color: red;">*</span></label>
               <input type="number" class="form-control" id="kuantitasEdit" name="kuantitasEdit" value="1" placeholder="Masukkan Kuantitas" required>
             </div>
@@ -462,6 +475,10 @@
               <label for="totalHargaEdit" class="form-label">Total Harga<span style="color: red;">*</span></label>
               <input type="text" class="form-control" id="totalHargaEdit" name="totalHargaEdit" placeholder="Isi kuantitas untuk menampilkan total" readonly>
             </div>
+            <div class="mb-3">
+              <label for="keteranganEdit" class="form-label">Keterangan</label>
+              <textarea class="form-control" id="keteranganEdit" name="keteranganEdit" placeholder="Masukkan Keterangan" required></textarea>
+            </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keluar</button>
               <button type="submit" class="btn btn-primary" name="prosesEdit">Simpan</button>
@@ -473,7 +490,7 @@
   </div>
 
   <!-- Modal delete-->
-  <div class="modal fade" id="deleteModalBarangKeluar" tabindex="-1" aria-labelledby="deleteModalLabelBarangKeluar" aria-hidden="true">
+  <div class="modal fade" id="deleteModalTransaksi" tabindex="-1" aria-labelledby="deleteModalLabelBarangKeluar" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <form id="deleteForm" method="post" action="">
@@ -482,7 +499,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            Apakah Anda yakin ingin menghapus data no <span id="idBarangKeluarDelete"></span>?
+            Apakah Anda yakin ingin menghapus data transaksi no <span id="idBarangKeluarDelete"></span>?
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kembali</button>
@@ -507,18 +524,24 @@
       return 'Rp ' + amount.toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
     }
 
-    function populateModalEditStok(idBarangKeluar, kodeBarang, idSatuan, kodeTipe, kuantitas, hargaBarang, totalHarga, updatedAt) {
+    function populateModalEditTransaksi(idBarangKeluar, kodeBarang, kodeTipe, idSatuan, hargaBarang, kuantitas, totalHarga, keterangan, namaPelanggan, noHp, tipeKendaraan, noKendaraan, idUser, updatedAt) {
       document.getElementById('idBarangKeluarEdit').value = idBarangKeluar;
       document.getElementById('pilihBarangEdit').value = kodeBarang;
-      document.getElementById('idSatuanEdit').value = idSatuan;
       document.getElementById('kodeTipeEdit').value = kodeTipe;
-      document.getElementById('kuantitasEdit').value = kuantitas;
+      document.getElementById('idSatuanEdit').value = idSatuan;
       document.getElementById('hargaBarangEdit').value = formatRupiah(parseFloat(hargaBarang));
+      document.getElementById('kuantitasEdit').value = kuantitas;
       document.getElementById('totalHargaEdit').value = formatRupiah(parseFloat(totalHarga));
+      document.getElementById('keteranganEdit').value = keterangan;
+      document.getElementById('namaPelangganEdit').value = namaPelanggan;
+      document.getElementById('noHpEdit').value = noHp;
+      document.getElementById('pilihKendaraanEdit').value = tipeKendaraan;
+      document.getElementById('noKendaraanEdit').value = noKendaraan;
+      document.getElementById('idUserEdit').value = idUser;
       document.getElementById('updatedAtEdit').value = updatedAt;
     }
 
-    function populateDeleteModalStok(idBarangKeluar) {
+    function populateDeleteModalTransaksi(idBarangKeluar) {
       document.getElementById('idBarangKeluarDelete').innerText = idBarangKeluar;
       document.getElementById('idBarangKeluarDeleteInput').value = idBarangKeluar;
     }
